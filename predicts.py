@@ -235,7 +235,7 @@ def luh2(scenario, year, fnf):
 
   for lu in ('mature_secondary', 'nitrogen', 'rangelands'):
     name = '%s_light_and_intense' % lu
-    rasters[name] = SimpleExpr(name, '%s_minimal + %s_light' % (lu, lu))
+    rasters[name] = SimpleExpr(name, '%s_light + %s_intense' % (lu, lu))
 
   for intensity in ['light', 'intense']:
     expr = ' + '.join(['%s_%s' % (name, intensity) for
