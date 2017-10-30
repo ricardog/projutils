@@ -38,7 +38,7 @@ def ri2pi(obj):
     try:
       #res = pandas2ri.ri2py(obj)
       standard = False
-    except ValueError, e:
+    except ValueError as e:
       standard = False
     if not standard:
       res = pd.DataFrame()

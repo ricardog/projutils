@@ -30,27 +30,27 @@ def get_stats(files):
   for f in files:
     ds = gdal.Open(f)
     if ds is None:
-      print "Error: failed to open '%s" % f
+      print("Error: failed to open '%s" % f)
       sys.exit(1)
     if x_size is None:
       x_size = ds.RasterXSize
       y_size = ds.RasterYSize
     else:
       if (x_size != ds.RasterXSize or y_size != ds.RasterYSize):
-        print "raster have mismatched sizes (%d = %d; %d = %d)" % (x_size,
+        print("raster have mismatched sizes (%d = %d; %d = %d)" % (x_size,
                                                                    ds.RasterXSize,
                                                                    y_size,
-                                                                   ds.RasterYSize)
+                                                                   ds.RasterYSize))
         sys.exit(1)
     l, h = tiff_utils.get_min_max(ds)
     low.append(l)
     high.append(h)
     bands.append(ds.RasterCount)
-  print "min: %.2f / max: %.2f [%d x %d] : %d" % (min(low),
+  print("min: %.2f / max: %.2f [%d x %d] : %d" % (min(low),
                                                   max(high),
                                                   x_size,
                                                   y_size,
-                                                  sum(bands))
+                                                  sum(bands)))
   return(min(low), max(high), x_size, y_size, bands)
 
 def convert(title, fps, palette, band, oname, files):

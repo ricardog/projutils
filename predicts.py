@@ -112,8 +112,8 @@ def luh5(scenario, year, plus3):
                 'ds/luh2/secd-' + scenario + '.nc'):
     try:
       ds = netCDF4.Dataset(fname)
-    except IOError, e:
-      print "Error: opening '%s'" % fname
+    except IOError as e:
+      print("Error: opening '%s'" % fname)
       raise IOError("Error: opening '%s'" % fname)
     ds_vars = set(ds.variables.keys())
     names = set(reduce(lambda x,y: x + y, [lu.syms for lu in lus], ['urban']))
@@ -196,8 +196,8 @@ def luh2(scenario, year, fnf):
                 'ds/luh2/secd-' + scenario + '.nc'):
     try:
       ds = netCDF4.Dataset(fname)
-    except IOError, e:
-      print "Error: opening '%s'" % fname
+    except IOError as e:
+      print("Error: opening '%s'" % fname)
       raise IOError("Error: opening '%s'" % fname)
     ds_vars = set(ds.variables.keys())
     names = set(reduce(lambda x,y: x + y, [lu.syms for lu in lus], ['urban']))
@@ -319,31 +319,31 @@ def predictify(mod):
     return
 
   if 'UseIntensity' in syms:
-    print 'predictify UseIntensity as base'
+    print('predictify UseIntensity as base')
     f = lambda x: ui.predictify(x, 'UseIntensity')
     mod.equation.transform(f)
     
   for prefix in ('UI', 'UImin2'):
     if prefix in syms:
       if lui.luh5.is_luh5(syms[prefix], prefix):
-        print 'predictify %s as luh5' % prefix
+        print('predictify %s as luh5' % prefix)
         f = lambda x: lui.luh5.predictify(x, prefix)
       elif lui.luh2.is_luh2(syms[prefix], prefix):
-        print 'predictify %s as luh2' % prefix
+        print('predictify %s as luh2' % prefix)
         f = lambda x: lui.luh2.predictify(x, prefix)
       else:
-        print 'predictify %s as rcp' % prefix
+        print('predictify %s as rcp' % prefix)
         f = lambda x: lui.rcp.predictify(x, prefix)
       mod.equation.transform(f)
   if 'LandUse' in syms:
     if lu.luh5.is_luh5(syms['LandUse'], 'LandUse'):
-      print 'predictify LandUse as luh5'
+      print('predictify LandUse as luh5')
       f = lambda x: lu.luh5.predictify(x, 'LandUse')
     elif lui.luh2.is_luh2(syms['LandUse'], 'LandUse'):
-      print 'predictify LandUse as luh2'
+      print('predictify LandUse as luh2')
       f = lambda x: lu.luh2.predictify(x, 'LandUse')
     else:
-      print 'predictify LandUse as rcp'
+      print('predictify LandUse as rcp')
       f = lambda x: lu.rcp.predictify(x, 'LandUse')
     mod.equation.transform(f)
   mod.equation.transform(nodots)

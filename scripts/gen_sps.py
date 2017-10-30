@@ -146,7 +146,7 @@ def main():
     data = init_nc(out, affine.to_gdal(), lats, lons, years, variables)
 
     for ssp in ssps:
-      print ssp
+      print(ssp)
       with click.progressbar(enumerate(years), length=len(years)) as bar:
         for idx, year in bar:
           yy = mixing(year)

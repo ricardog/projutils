@@ -9,14 +9,14 @@ from ..mp4_utils import to_mp4
 
 def main():
   if len(sys.argv) not in (3, 4):
-    print "Usage: %s <file.nc> <var-name> [title]" % os.path.basename(sys.argv[0])
+    print("Usage: %s <file.nc> <var-name> [title]" % os.path.basename(sys.argv[0]))
     sys.exit(1)
-  print len(sys.argv)
+  print(len(sys.argv))
   fname = sys.argv[1]
   vname = sys.argv[2]
   title = '%s from %s' % (vname, fname) if len(sys.argv) < 4 else sys.argv[3]
   oname = "%s.mp4" % vname
-  print "converting %s from %s to mp4" % (vname, fname)
+  print("converting %s from %s to mp4" % (vname, fname))
   nc_ds = netCDF4.Dataset(fname)
   years = nc_ds.variables['time'][:]
   if years[0] < 850:

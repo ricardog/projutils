@@ -75,8 +75,8 @@ def load(path):
   pypath = os.path.splitext(path)[0] + '.py'
   if (os.path.isfile(pypath) and
       os.path.getmtime(pypath) > os.path.getmtime(path)):
-    #print "loading %s" % pypath
+    #print("loading %s" % pypath)
     return read_py(pypath)
-  print "loading %s" % path
+  print("loading %s" % path)
   import rds
   return rds.read(path)

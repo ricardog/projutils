@@ -31,13 +31,13 @@ def create_fields(layer, db):
 
   # printing
   for feats_class in class_list:
-    print feats_class
+    print(feats_class)
     short_name = feats_class[:10]
     field_def = ogr.FieldDefn(short_name, ogr.OFTReal)
     field_def.SetWidth(18)
     field_def.SetPrecision(8)
     if layer.CreateField(field_def) != 0:
-      print "Can't create field %s" % field_def.GetNameRef()
+      print("Can't create field %s" % field_def.GetNameRef())
       return False
   return True
 
@@ -52,19 +52,19 @@ def open_db(db_file):
   driverName = "OpenFileGDB"
   drv = ogr.GetDriverByName(driverName)
   if drv is None:
-    print "%s driver not available.\n" % driverName
+    print("%s driver not available.\n" % driverName)
     sys.exit(1)
   # Second argument 0 means read-only
   try:
     db = drv.Open(db_file, 0)
-  except Exception, e:
+  except Exception as e:
     raise e
   if db is None:
     raise RuntimeError("Failed to opeb GDB directory: %s" % db_file)
 
   layer = db.GetLayer()
-  print "Features in DB layer %s: %d" % (layer.GetName(),
-                                         layer.GetFeatureCount())
+  print("Features in DB layer %s: %d" % (layer.GetName(),
+                                         layer.GetFeatureCount()))
   return db
 
 def distance_to_feature(p, layer, radius):
@@ -117,14 +117,14 @@ def process(layer, db, quiet):
         distance = -9999
       feature.SetField(shortName, distance)
       if layer.SetFeature(feature) != 0:
-        print 'Failed to update feature.'
+        print('Failed to update feature.')
         sys.exit(1)
 
   if not quiet:
-    print '\nCompleted in %.2f sec' % (time.time() - start)
-    print 'Retries:'
+    print('\nCompleted in %.2f sec' % (time.time() - start))
+    print('Retries:')
     for r in radii:
-      print "%4d: %4d" % (r, retries[r])
+      print("%4d: %4d" % (r, retries[r]))
 
 def compute_distance(gdb_dir, shapefile):
   '''For every point in `shapefile' find the diatance to the neartest
@@ -149,7 +149,7 @@ def compute_distance(gdb_dir, shapefile):
   else:
     shape = ogr.Open(shapefile.name, 1)
   if shape is None:
-    print 'Unable to open shapefile', in_shapefile
+    print('Unable to open shapefile', in_shapefile)
     sys.exit(1)
 
   layer = shape.GetLayer(0)
@@ -208,7 +208,7 @@ def rasterize(gdb_dir, resolution, raster_fn):
 def proximitize(raster_fn, src_band, dst_band):
   target_ds = gdal.Open(raster_fn, gdal.GA_Update)
   if target_ds is None:
-    print "Error: could not open raster file '%s'" % raster_fn
+    print("Error: could not open raster file '%s'" % raster_fn)
   src = target_ds.GetRasterBand(src_band)
   dst = target_ds.GetRasterBand(dst_band)
   options = ['NODATA=-9999', 'DISTUNITS=GEO', 'VALUES=1']

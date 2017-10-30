@@ -113,7 +113,7 @@ def is_luh2(syms, prefix):
   for sym in syms:
     try:
       newr = _predictify(sym, prefix)
-    except AssertionError, e:
+    except AssertionError as e:
       return False
   return True
 

@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 import string
 
-import poly
-from tree import Node, Operator
+import projections.r2py.poly as poly
+from projections.r2py.tree import Node, Operator
 
 Context = collections.namedtuple('Context', 'context index')
 

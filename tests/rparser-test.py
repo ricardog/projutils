@@ -21,9 +21,9 @@ if __name__ == "__main__":
   for i, t in enumerate(tests):
     result = rparser.PARSER.parseString(t)
     assert str(result) == results[i]
-    print result
+    print(result)
     nodes = rparser.parse(t)
-    print nodes
+    print(nodes)
 
   r1 = rparser.parse(tests[2])
   r2 = rparser.parse(tests[3])
@@ -38,9 +38,9 @@ if __name__ == "__main__":
   mod = glm.GLM(models[0])
   for t in mod.coefficients().itertuples():
     factor = t[0]
-    print factor + " -> ",
+    print(factor + " -> ",)
     try:
-      print rparser.parse(factor)
-    except ParseException, e:
-      print e
+      print(rparser.parse(factor))
+    except ParseException as e:
+      print(e)
       pass

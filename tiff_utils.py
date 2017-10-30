@@ -168,17 +168,17 @@ def get_stats(tiffs):
   for tiff in tiffs:
     ds = gdal.Open(tiff)
     if ds is None:
-      print "open failed"
+      print("open failed")
       return
     if x_size is None:
       x_size = ds.RasterXSize
       y_size = ds.RasterYSize
     else:
       if (x_size != ds.RasterXSize or y_size != ds.RasterYSize):
-        print "raster have mismatched sizes (%d = %d; %d = %d)" % (x_size,
+        print("raster have mismatched sizes (%d = %d; %d = %d)" % (x_size,
                                                                    ds.RasterXSize,
                                                                    y_size,
-                                                                   ds.RasterYSize)
+                                                                   ds.RasterYSize))
         sys.exit(-1)
     bands = ds.RasterCount
     all_bands.append(bands)
@@ -271,8 +271,8 @@ if __name__ == '__main__':
     regex = re.compile('%s_\d{4}.tif$' % sys.argv[1])
     tiffs = filter(lambda x: re.match(regex, x), os.listdir('minicam/lu'))
     mm = find_mm([os.path.join('minicam/lu', t) for t in tiffs])
-    print "min: %.4f\nmax: %.4f" % (mm[0], mm[1])
+    print("min: %.4f\nmax: %.4f" % (mm[0], mm[1]))
   else:
     ds = gdal.Open(sys.argv[1])
     l, h = get_min_max(ds)
-    print "min: %.2f / max: %.2f" % (l, h)
+    print("min: %.2f / max: %.2f" % (l, h))

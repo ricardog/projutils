@@ -5,7 +5,7 @@ import pandas as pd
 import re
 import tempfile
 
-from tree import Node
+from projections.r2py.tree import Node
 
 RE = re.compile('poly\(([^,]+),\s*(\d+)\)$')
 TERM_RE = re.compile('(' + RE.pattern.replace('$', '') + ')(\d+)')

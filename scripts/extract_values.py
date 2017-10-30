@@ -120,7 +120,7 @@ def invertGeoTransform( geoTransform ):
 def usage():
   '''Show usage synopsis.
   '''
-  print 'Usage: extract_values.py [-q] [-r] [-g] [-f] point_shapefile [raster_file(s)] [-d directory_with_rasters] [-rl list,of,rasters] [-e extension]'
+  print('Usage: extract_values.py [-q] [-r] [-g] [-f] point_shapefile [raster_file(s)] [-d directory_with_rasters] [-rl list,of,rasters] [-e extension]')
   sys.exit( 1 )
 
 def fileNamesToFileInfos( names ):
@@ -157,7 +157,7 @@ def createFields( inLayer, infos ):
         extract_csv.write(';'+i.fileBaseName)
       else:  
         if inLayer.CreateField( fieldDef ) != 0:
-          print "Can't create field %s" % fieldDef.GetNameRef()
+          print("Can't create field %s" % fieldDef.GetNameRef())
           return False
     else:
       shortName = i.fileBaseName[ :8 ]
@@ -170,7 +170,7 @@ def createFields( inLayer, infos ):
           extract_csv.write(';'+i.fileBaseName + str(b))
         else:  
           if inLayer.CreateField( fieldDef ) != 0:
-            print "Can't create field %s" % fieldDef.GetNameRef()
+            print("Can't create field %s" % fieldDef.GetNameRef())
             return False
   return True
 
@@ -199,8 +199,8 @@ class fileInfo:
   def reportInfo( self ):
     ''' Display infrmation about fileInfo object.
     '''
-    print 'Filename:', self.fileName
-    print 'Bands:', self.bands
+    print('Filename:', self.fileName)
+    print('Bands:', self.bands)
 
 # ==============================================================================
 
@@ -236,7 +236,7 @@ class gdalInfo:
     for i in range( gdal.GetDriverCount() ):
       driver = gdal.GetDriver( i )
       if driver == None:
-        print 'Unable to get driver', i
+        print('Unable to get driver', i)
         continue
 
       # now we need to see if the driver is for something currently
@@ -348,7 +348,7 @@ def main():
       inRasters.append(args[i])
     i += 1
   
-  if not quiet: print 'Found GDAL version:', gdalInfo().version(), '\n'
+  if not quiet: print('Found GDAL version:', gdalInfo().version(), '\n')
   
   if inShapeName is None:
     print("No point shapefile was specified. Nothing to do.")
@@ -367,7 +367,7 @@ def main():
         for rasterPaths in rasterPaths2:
             f = '*.' + ext
             if f not in formats:
-                print 'Raster extension (%s) is not supported'%ext
+                print('Raster extension (%s) is not supported'%ext)
                 sys.exit( 1 )
             files = glob.glob( rasterPath + f )
             inRasters.extend( files )
@@ -379,7 +379,7 @@ def main():
               inRasters.extend( files )
 
   if len( inRasters ) == 0:
-    print 'No input rasters selected.'
+    print('No input rasters selected.')
     usage()
 
   # convert filenames to fileinfos
@@ -391,7 +391,7 @@ def main():
   else:
     inShape = ogr.Open( inShapeName, 1 )
   if inShape is None:
-    print 'Unable to open shapefile', inShapeName
+    print('Unable to open shapefile', inShapeName)
     sys.exit( 1 )
 
   inLayer = inShape.GetLayer( 0 )
@@ -426,12 +426,12 @@ def main():
     if not quiet: pb.update( i )
     gt = f.geotransform
     rasterCRS = f.projection
-    #print "Layer", layerCRS.ExportToWkt()
-    #print "Raster", rasterCRS.ExportToWkt()
+    #print("Layer", layerCRS.ExportToWkt())
+    #print("Raster", rasterCRS.ExportToWkt())
     if needTransform:
       coordTransform = osr.CoordinateTransformation( layerCRS, rasterCRS )
       if coordTransform is None and needTransform:
-        print 'Error while creating coordinate transformation.'
+        print('Error while creating coordinate transformation.')
         sys.exit( 1 )
     if not gdalalloc:
         ds = gdal.Open( f.fileName )
@@ -447,7 +447,7 @@ def main():
         geom = inFeat.GetGeometryRef()
         x = geom.GetX()
         y = geom.GetY()
-        #print "BEFORE", x, y
+        #print("BEFORE", x, y)
         if needTransform:
           res = coordTransform.TransformPoint( x, y, 0 )
           x = res[ 0 ]
@@ -468,7 +468,7 @@ def main():
         else:    
           inFeat.SetField( shortName, float(value) )
           if inLayer.SetFeature( inFeat ) != 0:
-            print 'Failed to update feature.'
+            print('Failed to update feature.')
             sys.exit( 1 )
 
         inFeat = inLayer.GetNextFeature()
@@ -503,7 +503,7 @@ def main():
             else:
               inFeat.SetField( shortName + str( b + 1 ), float(values[b]) )
               if inLayer.SetFeature( inFeat ) != 0:
-                print 'Failed to update feature.'
+                print('Failed to update feature.')
                 sys.exit( 1 )
         else:
           for b in range( f.bands ):
@@ -517,7 +517,7 @@ def main():
             else:
               inFeat.SetField( shortName + str( b + 1 ), float(value) )
               if inLayer.SetFeature( inFeat ) != 0:
-                print 'Failed to update feature.'
+                print('Failed to update feature.')
                 sys.exit( 1 )
         inFeat = inLayer.GetNextFeature()
     ds = None

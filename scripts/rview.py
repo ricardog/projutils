@@ -13,7 +13,7 @@ def get_min_max(fname):
   ds = gdal.Open(fname)
   min, max = tu.get_min_max(ds)
   del ds
-  print '[%6.3f : %6.3f]' % (min, max)
+  print('[%6.3f : %6.3f]' % (min, max))
   return min, max
 
 @click.command()

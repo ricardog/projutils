@@ -16,7 +16,7 @@ import tiff_utils as tu
 
 tf_ab_model = rds.read('../models/ab-tropical-forest.rds')
 syms = tf_ab_model.hstab
-print "Model symbols:"
+print("Model symbols:")
 pprint.pprint(syms)
 
 # Read in a mask to apply to the output

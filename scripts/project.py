@@ -52,7 +52,7 @@ class RasterSet(click.ParamType):
     try:
       return rasterset.RasterSet(u.netloc, u.path, urlparse.parse_qs(u.query))
     except ValueError:
-      print "RasterSet(%s).__init__ failed" % value
+      print("RasterSet(%s).__init__ failed" % value)
       self.fail('%s is not a valid raster set' % value, param, ctx)
     return
   
@@ -61,11 +61,11 @@ class RasterSet(click.ParamType):
       mod = _str_to_module(u.netloc)
       func = getattr(mod, '_ref_to_path')
       value = func(u.path, urlparse.parse_qs(u.query))
-      print value
+      print(value)
       return value[0]
-    except ValueError, e:
-      print 'in exception handler'
-      print e
+    except ValueError as e:
+      print('in exception handler')
+      print(e)
       self.fail('%s is not a valid raster set' % value, param, ctx)
 
 RASTER_SET = RasterSet()
@@ -386,9 +386,9 @@ def project(hpd_ref, lu_ref, mask):
 @cli.command()
 @click.argument('src-rasters', type=RASTER_SET)
 def test(src_rasters):
-  print src_rasters
+  print(src_rasters)
   src_rasters.some_test_func()
-  print src_rasters.years
+  print(src_rasters.years)
   
 if __name__ == '__main__':
   cli()

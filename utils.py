@@ -124,8 +124,8 @@ def run(cmd, sem=None):
     else:
       with sem:
         out = subprocess.check_output(cmd, shell=False, stderr=subprocess.STDOUT)
-  except subprocess.CalledProcessError, e:
-    print e.output
+  except subprocess.CalledProcessError as e:
+    print(e.output)
     sys.exit(1)
   return out
 

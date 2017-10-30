@@ -21,7 +21,7 @@ luh2_models = ['../models/sr1-model.rds',
                ]
 
 def process(fname, rcp=False, luh2=False):
-  print "*** %s" % fname
+  print("*** %s" % fname)
   mod = rds.read(fname)
   eqn = mod.equation
   pprint.pprint(eqn)

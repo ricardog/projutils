@@ -42,5 +42,5 @@ class ProgressBar(object):
     '''Called to print a new line and (optionally) the time elapsed for the
 operation.
     '''
-    print '\nCompleted in %.2fs' % (time.time() - self.start)
+    print('\nCompleted in %.2fs' % (time.time() - self.start))
     

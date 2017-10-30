@@ -1,6 +1,6 @@
 import six
 from rpy2.robjects.methods import RS4Auto_Type
-import mermod
+import projections.r2py.mermod as mermod
 
 @six.add_metaclass(RS4Auto_Type)
 class LMerMod(mermod.MerMod):

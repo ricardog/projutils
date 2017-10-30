@@ -40,7 +40,7 @@ class Node(object):
     # visiting children.o
     try:
       newnode = f(self)
-    except StopIteration, e:
+    except StopIteration as e:
       # Skip processing this node's children
       return self
     if newnode is None or not isinstance(newnode, Node):

@@ -5,10 +5,10 @@ import re
 import rpy2.robjects as robjects
 import rpy2.rinterface as rinterface
 
-import eval
-from ri2pi import ri2pi
-import rparser
-from tree import Node, Operator
+import projections.r2py.reval as reval
+from projections.r2py.ri2pi import ri2pi
+import projections.r2py.rparser as rparse
+from projections.r2py.tree import Node, Operator
 
 class GLM():
   def __init__(self, obj=None):
@@ -46,7 +46,7 @@ class GLM():
       if (not isinstance(node, Node) or node.type != Operator('poly') or
           len(node.args) == 4):
         continue
-      name = '%s(%s, %d)' % (node.type, eval.to_rexpr(node.args[0]),
+      name = '%s(%s, %d)' % (node.type, reval.to_rexpr(node.args[0]),
                              node.args[1])
       coefs = robjects.r.attr(raw_model.rx2(name), which="coefs")
       assert coefs != rinterface.NULL
@@ -86,16 +86,16 @@ class GLM():
     self._equation = self.equation.transform(match)
 
   def to_py(self, fname):
-    return eval.to_py(self.equation, fname)
+    return reval.to_py(self.equation, fname)
 
   def to_pyx(self, fname):
-    return eval.to_pyx(self.equation, fname)
+    return reval.to_pyx(self.equation, fname)
 
   def to_numba(self, fname):
-    return eval.to_numba(self.equation, fname, self.output)
+    return reval.to_numba(self.equation, fname, self.output)
 
   def eval(self, df):
-    return eval.evalr(self.equation, df)
+    return reval.evalr(self.equation, df)
   
   @property
   def equation(self):
@@ -111,7 +111,7 @@ class GLM():
       expr = Node(Operator('+'), prods)
       root = Node(inv_link, [Node(Operator('var'),
                                             (hash(expr), expr))])
-      self._equation = eval.make_inputs(root)
+      self._equation = reval.make_inputs(root)
       self._cse()
       self._polys()
     return self._equation
@@ -122,7 +122,7 @@ class GLM():
 
   @property
   def syms(self):
-    return eval.find_inputs(self.equation)
+    return reval.find_inputs(self.equation)
 
   def frame(self):
     return self.data()

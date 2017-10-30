@@ -21,7 +21,7 @@ import tempfile
 from .. import geotools
 from .. import utils
 from .. import tiff_utils
-from ..r2py import eval as myeval
+from ..r2py import reval as reval
 from ..r2py import rparser
 
 LU = {'primary': 'gothr - gfvh1 - gfvh2',
@@ -54,20 +54,20 @@ def expr(lu):
 
 def tree(lu):
   if lu not in trees:
-    trees[lu] = myeval.make_inputs(rparser.parse(expr(lu)))
+    trees[lu] = reval.make_inputs(rparser.parse(expr(lu)))
   return trees[lu]
   
 def func(lu):
   if lu not in funcs:
     lokals = {}
-    exec myeval.to_py(tree(lu), lu) in lokals
+    exec reval.to_py(tree(lu), lu) in lokals
     funcs[lu] = lokals[lu + '_st']
   return funcs[lu]
 
 def syms(lu):
   if lu not in symbols:
     root = tree(lu)
-    symbols[lu] = myeval.find_inputs(root)
+    symbols[lu] = reval.find_inputs(root)
   return symbols[lu]
 
 def all_files(hh):
@@ -147,7 +147,7 @@ def project(lu, in_dir, year, mask):
     fname = os.path.join(in_dir, '%s.%s.tif' % (name, year))
     ds = gdal.Open(fname)
     if ds is None:
-      print "error reading input raster '%s'" % fname
+      print("error reading input raster '%s'" % fname)
       sys.exit(1)
     band = ds.GetRasterBand(1)
     array = band.ReadAsArray()
@@ -208,7 +208,7 @@ def _ref_to_path(p):
   return base
 
 def some_test_func():
-  print 'some_test_func called'
+  print('some_test_func called')
   
 if __name__ == '__main__':
   root_dir = os.path.join('ds', 'lu', 'rcp', 'minicam')

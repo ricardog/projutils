@@ -7,7 +7,7 @@ import rasterio
 import sys
 
 def error(msg, exit=True):
-  print msg
+  print(msg)
   if exit:
     sys.exit(1)
   
@@ -41,7 +41,7 @@ for b in xrange(r1.count):
     mismatch = df[~np.isclose(df.b1, df.b2, equal_nan=True, atol=atol)]
     print('band %d: %d data mismatched' % (b + 1,
                                            len(mismatch.index)))
-    print mismatch
+    print(mismatch)
           
     #import pdb; pdb.set_trace()
     rval = 1

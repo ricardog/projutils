@@ -13,12 +13,12 @@ import geotools
 
 def main():
   if len(sys.argv) != 2:
-    print "Usage: %s <raster-file>" % sys.argv[0]
+    print("Usage: %s <raster-file>" % sys.argv[0])
     sys.exit()
 
   src_ds = gdal.Open(sys.argv[1])
   if src_ds is None:
-    print "Error: could not open file '%s'" % sys.argv[1]
+    print("Error: could not open file '%s'" % sys.argv[1])
     sys.exit()
   src_data = src_ds.GetRasterBand(1).ReadAsArray()
   src_nodata = src_ds.GetRasterBand(1).GetNoDataValue()
@@ -31,12 +31,12 @@ def main():
   srs.ImportFromWkt(src_ds.GetProjection())
 
   name = os.path.splitext(sys.argv[1])[0]
-  print name
+  print(name)
   ofile = name + '.nc'
 
   dst_drv = gdal.GetDriverByName('netCDF')
   if dst_drv is None:
-    print "Error: could not get driver '%s'" % 'netCDF'
+    print("Error: could not get driver '%s'" % 'netCDF')
     sys.exit()
 
   dst_ds = dst_drv.CreateCopy('foo.nc', src_ds, 0)
