@@ -115,7 +115,7 @@ def to_png(iname, color, oname, band=1):
 
 def get_min_max(ds, algo='mincut'):
   low = None
-  high = None
+  high = 0.0
   lower = 0.02
   higher = 0.98
   bins = 256

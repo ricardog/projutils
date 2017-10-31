@@ -1,4 +1,5 @@
 
+from functools import reduce
 import netCDF4
 import os
 import sys
@@ -41,7 +42,7 @@ def rcp(scenario, year, hpd_trend):
                                    'ds/rcp/roads-final.tif')
 
   ## Inputs RCP rasters
-  names = tuple(set(reduce(lambda x,y: x + y, [lu.syms for lu in lus], [])))
+  names = tuple(set(reduce(lambda x,y: x + y, [list(lu.syms) for lu in lus], [])))
   
   for name in names:
     path = 'ds/lu/rcp/%s/updated_states/%s.%d.tif' % (scenario, name, year)
@@ -200,7 +201,7 @@ def luh2(scenario, year, fnf):
       print("Error: opening '%s'" % fname)
       raise IOError("Error: opening '%s'" % fname)
     ds_vars = set(ds.variables.keys())
-    names = set(reduce(lambda x,y: x + y, [lu.syms for lu in lus], ['urban']))
+    names = set(reduce(lambda x,y: x + y, [list(lu.syms) for lu in lus], ['urban']))
     for name in set.intersection(names, ds_vars):
       band = year - 849 if scenario == 'historical' else year - 2014
       rasters[name] = Raster(name, "netcdf:%s:%s" % (fname, name),

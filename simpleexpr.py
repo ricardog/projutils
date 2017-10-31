@@ -25,6 +25,6 @@ class SimpleExpr():
       print("Error: input '%s' not defined" % e)
       raise e
     if not isinstance(res, np.ndarray):
-      res = ma.masked_array(np.full(df.values()[0].shape, res,
+      res = ma.masked_array(np.full(tuple(df.values())[0].shape, res,
                                     dtype=np.float32))
     return res

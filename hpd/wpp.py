@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import click
-import itertools
 from joblib import memory
 import numpy as np
 import numpy.ma as ma
@@ -70,7 +69,7 @@ def get_sheets(trend, wpp):
     assert trend.upper() in xls.sheet_names
     names = [trend.upper()]
   sheets = [pd.read_excel(wpp, name) for name in names]
-  for name, sheet in itertools.izip(names, sheets):
+  for name, sheet in zip(names, sheets):
     ## FIXME: I store the name of the sheet (or tab) in cell (0, 0)
     ## becuase memcache will not preserve metadata attributes.  Once
     ## this gets fixed in pandas, it would be cleaner to create an
