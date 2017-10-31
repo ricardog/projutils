@@ -3,7 +3,7 @@
 
 import click
 import os
-import urlparse
+import urllib
 
 from ..roads import groads
 from .. import hpd
@@ -48,7 +48,7 @@ class RasterSet(click.ParamType):
         parent = mod
       return parent
 
-    u = urlparse.urlparse(value)
+    u = urllib.parse(value)
     try:
       return rasterset.RasterSet(u.netloc, u.path, urlparse.parse_qs(u.query))
     except ValueError:
