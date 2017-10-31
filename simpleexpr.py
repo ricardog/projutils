@@ -10,8 +10,7 @@ class SimpleExpr():
     self.name = name
     self.tree = reval.make_inputs(rparser.parse(expr))
     lokals = {}
-    ## FIXME 2to3
-    exec(reval.to_py(self.tree, name), None, lokals)
+    exec(reval.to_py(self.tree, name), lokals)
     self.func = lokals[name + '_st']
 
   @property
