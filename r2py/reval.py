@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import string
 
-from .poly import poly
+from . import poly
 from .tree import Node, Operator
 
 Context = collections.namedtuple('Context', 'context index')
@@ -217,7 +217,7 @@ def find_syms(root, ctx=None):
   return lsyms
 
 def find_inputs(root):
-  return find_input_types(root).keys()
+  return tuple(find_input_types(root).keys())
 
 def find_input_types(root):
   types = collections.OrderedDict()
@@ -229,7 +229,7 @@ def find_input_types(root):
   return types
 
 def find_nonvector(root):
-  letters = list(string.lowercase)
+  letters = list(string.ascii_lowercase)
   nonvector = (Operator('poly'), )
   nodes = collections.OrderedDict()
   def replace(node):

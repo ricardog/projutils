@@ -1,4 +1,5 @@
 import itertools
+import sys
 
 class Node(object):
   def __init__(self, t, args):
@@ -24,6 +25,11 @@ class Node(object):
       return not self.__eq__(other)
     return NotImplemented
 
+  def __hash__(self):
+    h = hash((self.type, self.args)) & sys.maxsize
+    assert h > 0
+    return h
+  
   def walk(self):
     ## NOTE: Various bits of code depend on this function doing
     ## post-order traversal.
@@ -47,7 +53,7 @@ class Node(object):
       return newnode
     newargs = tuple(child.transform(f) if isinstance(child, Node) else f(child)
                     for child in newnode.args)
-    newnode.args = filter(lambda x: x is not None, newargs)
+    newnode.args = tuple(filter(lambda x: x is not None, newargs))
     return newnode
     
 class Operator(object):
