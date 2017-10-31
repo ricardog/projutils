@@ -9,10 +9,10 @@ import rpy2.robjects.packages
 robjects.packages.importr('Matrix')
 robjects.packages.importr('lme4')
 
-import projections.r2py.reval as reval
-from projections.r2py.ri2pi import ri2pi
-import projections.r2py.rparser as rpser
-from projections.r2py.tree import Node, Operator
+from . import reval
+from . import ri2pi
+from . import rparser
+from .tree import Node, Operator
 
 class MerMod(robjects.methods.RS4):
   '''Generic class for representing mixed-effect models.  This class is

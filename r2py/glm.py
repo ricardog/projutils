@@ -5,10 +5,10 @@ import re
 import rpy2.robjects as robjects
 import rpy2.rinterface as rinterface
 
-import projections.r2py.reval as reval
-from projections.r2py.ri2pi import ri2pi
-import projections.r2py.rparser as rparse
-from projections.r2py.tree import Node, Operator
+from . import reval
+from . import ri2pi
+from . import rparser
+from .tree import Node, Operator
 
 class GLM():
   def __init__(self, obj=None):

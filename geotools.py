@@ -145,9 +145,9 @@ def srs_get_inv_flattening(srs):
     return osgeo.osr.SRS_WGS84_INVFLATTENING
   raise RuntimeError('ricardog needs to deal with non-WGS84 reference systems')
 
-osgeo.osr.SpatialReference.GetPrimeMeridian = types.MethodType(srs_get_prime_meridian, None, osgeo.osr.SpatialReference)
-osgeo.osr.SpatialReference.GetSemiMajor = types.MethodType(srs_get_semi_major, None, osgeo.osr.SpatialReference)
-osgeo.osr.SpatialReference.GetInvFlattening = types.MethodType(srs_get_inv_flattening, None, osgeo.osr.SpatialReference)
+osgeo.osr.SpatialReference.GetPrimeMeridian = types.MethodType(srs_get_prime_meridian, osgeo.osr.SpatialReference)
+osgeo.osr.SpatialReference.GetSemiMajor = types.MethodType(srs_get_semi_major, osgeo.osr.SpatialReference)
+osgeo.osr.SpatialReference.GetInvFlattening = types.MethodType(srs_get_inv_flattening, osgeo.osr.SpatialReference)
 
 if __name__ == '__main__':
     # Test degree to radian conversion

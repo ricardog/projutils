@@ -2,7 +2,7 @@ from pyparsing import *
 import re
 ParserElement.enablePackrat()
 
-from projections.r2py.tree import Node, Operator
+from .tree import Node, Operator
 
 import pdb
 

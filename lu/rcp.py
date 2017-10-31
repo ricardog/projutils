@@ -60,7 +60,8 @@ def tree(lu):
 def func(lu):
   if lu not in funcs:
     lokals = {}
-    exec reval.to_py(tree(lu), lu) in lokals
+    ## FIXME 2to3
+    exec(reval.to_py(tree(lu), lu), None, lokals)
     funcs[lu] = lokals[lu + '_st']
   return funcs[lu]
 

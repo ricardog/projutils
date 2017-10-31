@@ -1,7 +1,7 @@
 
 import re
 
-from ..r2py import eval as myeval
+from ..r2py import reval as reval
 from ..r2py import rparser
 
 LU = {'annual': 'c3ann + c4ann',
@@ -31,20 +31,20 @@ def expr(lu):
 
 def tree(lu):
   if lu not in trees:
-    trees[lu] = myeval.make_inputs(rparser.parse(expr(lu)))
+    trees[lu] = reval.make_inputs(rparser.parse(expr(lu)))
   return trees[lu]
   
 def func(lu):
   if lu not in funcs:
     lokals = {}
-    exec myeval.to_py(tree(lu), lu) in lokals
+    exec(reval.to_py(tree(lu), lu), None, lokals)
     funcs[lu] = lokals[lu + '_st']
   return funcs[lu]
 
 def syms(lu):
   if lu not in symbols:
     root = tree(lu)
-    symbols[lu] = myeval.find_inputs(root)
+    symbols[lu] = reval.find_inputs(root)
   return symbols[lu]
   
 def is_luh2(syms, prefix):
@@ -71,7 +71,7 @@ def is_luh2(syms, prefix):
   for sym in syms:
     try:
       newr = _predictify(sym, prefix)
-    except AssertionError, e:
+    except AssertionError as e:
       return False
   return True
 

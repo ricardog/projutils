@@ -3,13 +3,13 @@ import netCDF4
 import os
 import sys
 
-from rasterset import Raster
-from simpleexpr import SimpleExpr
-import hpd
-import lu
-import lui
-import ui
-import utils
+from .rasterset import Raster
+from .simpleexpr import SimpleExpr
+from . import hpd
+from . import lu
+from . import lui
+from . import ui
+from . import utils
 
 def rcp(scenario, year, hpd_trend):
   rasters = {}

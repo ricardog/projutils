@@ -2,15 +2,16 @@
 import numpy as np
 import numpy.ma as ma
 
-import r2py.reval as reval
-import r2py.rparser as rparser
+import projections.r2py.reval as reval
+import projections.r2py.rparser as rparser
 
 class SimpleExpr():
   def __init__(self, name, expr):
     self.name = name
     self.tree = reval.make_inputs(rparser.parse(expr))
     lokals = {}
-    exec reval.to_py(self.tree, name) in lokals
+    ## FIXME 2to3
+    exec(reval.to_py(self.tree, name), None, lokals)
     self.func = lokals[name + '_st']
 
   @property
