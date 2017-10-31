@@ -31,7 +31,7 @@ if r1.count != r2.count:
 
 rval = 0
 atol=1e-5
-for b in xrange(r1.count):
+for b in range(r1.count):
   df = pd.DataFrame({'b1': r1.read(b + 1).reshape(-1),
                      'b2': r2.read(b + 1).reshape(-1)})
   df = df[df.b1 != r1.nodatavals[b]]

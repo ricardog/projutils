@@ -38,7 +38,7 @@ def reproject(filename, bidx, resolution, resampling):
                    'nodata': src.nodata})
 
       if bidx is None:
-        bidx = xrange(1, src.count + 1)
+        bidx = range(1, src.count + 1)
       elif not isinstance(bidx, collections.Iterable):
         bidx = [bidx]
 

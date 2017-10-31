@@ -39,7 +39,7 @@ def to_mp4(title, oname, frames, data, text=None, fps=10, palette=None, cnorm=No
                     color='y', fontsize=24, transform = ax1.transAxes)
 
   with writer.saving(fig, oname, 180):
-    with click.progressbar(xrange(frames), length=frames) as bar:
+    with click.progressbar(range(frames), length=frames) as bar:
       for i in bar:
         yield i, img, text
         writer.grab_frame()
