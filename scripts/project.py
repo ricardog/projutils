@@ -128,7 +128,7 @@ def rcp():
               help='Select a range of years to extract')
 @click.option('--raster-dir', type=click.Path(),
               help='Directory where to store (or read from) land-use rasters' +
-              ' (default: ds/lu/rcp/<scenario>)')
+              ' (default: /out/lu/rcp/<scenario>)')
 def extract(tarfile, years, raster_dir):
   '''Extract RCS land-use data for the a specific <scenario>.
 

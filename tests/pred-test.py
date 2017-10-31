@@ -25,11 +25,11 @@ times.append(['rds', time.time()])
 times.append(['equation', time.time()])
 
 print("reading rasters")
-hpd_ds = gdal.Open('ds/hpd/wpp/high.tif')
+hpd_ds = gdal.Open('/out/hpd/wpp/high.tif')
 hpd = hpd_ds.GetRasterBand(1).ReadAsArray()
-cropland_ds = gdal.Open('ds/lu/rcp/aim/cropland_2010.tif')
+cropland_ds = gdal.Open('/out/lu/rcp/aim/cropland_2010.tif')
 cropland = cropland_ds.GetRasterBand(1).ReadAsArray()
-unSub_ds = gdal.Open('../../data/un_subregions/')
+unSub_ds = gdal.Open('/data/un_subregions/')
 unSub = unSub_ds.GetRasterBand(1).ReadAsArray()
 df = pd.DataFrame.from_dict({'hpd': hpd.reshape(-1),
                              'unSub': unSub.reshape(-1),

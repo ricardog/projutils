@@ -24,13 +24,13 @@ mask, _ = tu.to_array('../../data/rcp1.1/gicew.1700.txt')
 xsize, ysize = mask.shape
 
 # Where to find the RCP raw data files, i.e. gcrop, gthor, etc.
-rcp_dir = 'ds/lu/rcp/aim/updated_states'
+rcp_dir = '/out/lu/rcp/aim/updated_states'
 # Where to find baseline land use intensity data
-lui_dir = 'ds/lui'
+lui_dir = '/out/lui'
 # The baseline human population density data
 hpd_base = 'gluds00aghd.vrt'
 # UN WPP spreadsheet for projecting HPD
-wpp = '../../data/wpp/WPP2010_DB2_F01_TOTAL_POPULATION_BOTH_SEXES.xls'
+wpp = '/data/wpp/WPP2010_DB2_F01_TOTAL_POPULATION_BOTH_SEXES.xls'
 # UN subregions raster
 un_sub = '../../data/un_sub'
 # UN code raster
@@ -41,7 +41,7 @@ year = 2030
 
 # Prepare input data; fill all columns in the DataFrame
 df = pd.DataFrame()
-df['logDistRd.rs'] = tu.to_pd('ds/roads.rs.tif')
+df['logDistRd.rs'] = tu.to_pd('/out/roads.rs.tif')
 
 # Read human population density and rescale it
 df['hpd_base'] = tu.to_pd(hpd_base)
@@ -69,4 +69,4 @@ result = tf_ab_model.eval(df)
 result2 = result.reindex(range(mask.shape[0] * mask.shape[1]))
 
 # Write the resulting array to a GeoTIFF file
-tu.from_pd(result2, 'ds/abundance/tf-ab.%d.tif' % year)
+tu.from_pd(result2, '/out/abundance/tf-ab.%d.tif' % year)

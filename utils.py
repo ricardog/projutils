@@ -32,28 +32,32 @@ def mkpath(path):
     else:
       raise
 
+def outfn(res, *args):
+  return os.path.join(outdir(), res, *args)
+  
 @lrudecorator(10)
-def outdir(db=None):
-  cmd = ['make', 'outdir']
-  if db is not None:
-    cmd.append('DIVERSITY_DB=%s' % db)
-  return subprocess.check_output(cmd, shell=False).split('\n')[0]
+def outdir():
+  if 'OUTDIR' in os.environ:
+    outdir = os.environ['OUTDIR']
+  elif os.path.isdir('/out'):
+    outdir = '/out'
+    os.environ['OUTDIR'] = os.path.abspath(outdir)
+  else:
+    raise RuntimeError('please set OUTDIR')
+  return os.path.abspath(outdir)
 
 def lui_model_dir():
   return os.path.join(data_root(), 'lui_models')
 
 @lrudecorator(10)
 def data_root():
-  if platform.node() == 'vagrant':
-    dr = '/data'
-  elif 'DATA_ROOT' not in os.environ:
-    if os.path.isdir('../../data'):
-      dr = '../../data'
-      os.environ['DATA_ROOT'] = os.path.abspath(dr)
-    else:
-      raise RuntimeError('please set DATA_ROOT')
-  else:
+  if 'DATA_ROOT' in os.environ:
     dr = os.environ['DATA_ROOT']
+  elif os.path.isdir('/data'):
+    dr = '/data'
+    os.environ['DATA_ROOT'] = os.path.abspath(dr)
+  else:
+    raise RuntimeError('please set DATA_ROOT')
   return os.path.abspath(dr)
 
 def gdp_csv():

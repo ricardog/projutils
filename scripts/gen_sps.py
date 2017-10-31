@@ -137,11 +137,12 @@ def main():
   years = range(2010, 2101)
   ssps = ['ssp%d' % i for i in range(1, 6)]
   variables = [(ssp, 'f4', 'ppl/km^2', -9999) for ssp in ssps]
-  affine, lats, lons, res, cfudge = get_transform('ds/luh2/un_codes-full.tif',
+  fname = '%s/luh2/un_codes-full.tif' % utils.outdir()
+  affine, lats, lons, res, cfudge = get_transform(fname,
                                                   utils.sps(ssps[0], 2010))
   arr = (ma.empty((len(lats), len(lons)), fill_value=-9999),
          ma.empty((len(lats), len(lons)), fill_value=-9999))
-  oname = 'ds/luh2/sps.nc'
+  oname = '%s/luh2/sps.nc' % utils.outdir()
   with Dataset(oname, 'w') as out:
     data = init_nc(out, affine.to_gdal(), lats, lons, years, variables)
 

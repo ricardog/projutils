@@ -5,7 +5,7 @@ import gdal
 import env
 import poly
 
-ds = gdal.Open('ds/hpd/wpp/low.tif')
+ds = gdal.Open('/out/hpd/wpp/low.tif')
 if ds:
   hpd = ds.GetRasterBand(50).ReadAsArray()
   p2 = poly.poly(hpd, 'poly(logHPD.rs, 2)2')

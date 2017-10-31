@@ -11,6 +11,7 @@ from . import lu
 from . import lui
 from . import ui
 from . import utils
+from .utils import outfn
 
 def rcp(scenario, year, hpd_trend):
   rasters = {}
@@ -25,9 +26,9 @@ def rcp(scenario, year, hpd_trend):
   ]
 
   ## Human population density and UN subregions
-  rasters['hpd_ref'] = Raster('hpd_ref', 'ds/rcp/gluds00ag.tif')
-  rasters['unSub'] = Raster('unSub', 'ds/rcp/un_subregions.tif')
-  rasters['un_code'] = Raster('un_codes', 'ds/rcp/un_codes.tif')
+  rasters['hpd_ref'] = Raster('hpd_ref', outfn('rcp', 'gluds00ag.tif'))
+  rasters['unSub'] = Raster('unSub', outfn('rcp', 'un_subregions.tif'))
+  rasters['un_code'] = Raster('un_codes', outfn('rcp', 'un_codes.tif'))
   rasters['hpd'] = hpd.WPP(hpd_trend, year, utils.wpp_xls())
 
   ## NOTE: Pass max & min of log(HPD) so hi-res rasters can be processed
@@ -39,19 +40,20 @@ def rcp(scenario, year, hpd_trend):
   rasters['logHPD_rs'] = SimpleExpr('logHPD_rs',
                                     'scale(log(hpd + 1), 0.0, 1.0, 0.0, 9.93)')
   rasters['logDistRd_rs'] = Raster('logDistRd_rs',
-                                   'ds/rcp/roads-final.tif')
+                                   outfn('rcp', 'roads-final.tif'))
 
   ## Inputs RCP rasters
   names = tuple(set(reduce(lambda x,y: x + y, [list(lu.syms) for lu in lus], [])))
   
   for name in names:
-    path = 'ds/lu/rcp/%s/updated_states/%s.%d.tif' % (scenario, name, year)
+    path = outfn('lu', 'rcp', scenario, 'updated_states',
+                 '%s.%d.tif' % (name, year))
     rasters[name] = Raster(name, path)
 
   ## Land use intensity rasters
   for lu in lus:
     rasters[lu.name] = lu
-    ref_path = 'ds/rcp/%s-recal.tif' % lu.name
+    ref_path = outfn('rcp', '%s-recal.tif' % lu.name)
     for band, intensity in enumerate(lui.intensities()):
       n = lu.name + '_' + intensity
       rasters[n] = lui.RCP(lu.name, intensity)
@@ -83,11 +85,11 @@ def luh5(scenario, year, plus3):
     lus += [SimpleExpr('secondary', 'secdf + secdn')]
     
   ## Human population density and UN subregions
-  rasters['unSub'] = Raster('unSub', 'ds/luh5/un_subregions.tif')
-  rasters['un_code'] = Raster('un_codes', 'ds/luh5/un_codes.tif')
+  rasters['unSub'] = Raster('unSub', outfn('luh5', 'un_subregions.tif'))
+  rasters['un_code'] = Raster('un_codes', outfn('luh5', 'un_codes.tif'))
   #rasters.update(hpd.sps.raster(ssp, year))
   if year <= 2010:
-    rasters['hpd_ref'] = Raster('hpd_ref', 'ds/luh5/gluds00ag.tif')
+    rasters['hpd_ref'] = Raster('hpd_ref', outfn('luh5', 'gluds00ag.tif'))
     rasters['hpd'] = hpd.WPP('historical', year, utils.wpp_xls())
   else:
     rasters.update(hpd.sps.scale_grumps(utils.luh2_scenario_ssp(scenario),
@@ -110,7 +112,7 @@ def luh5(scenario, year, plus3):
 
   fname = utils.luh2_states(scenario)
   for fname in (utils.luh2_states(scenario),
-                'ds/luh2/secd-' + scenario + '.nc'):
+                outfn('luh2', 'secd-' + scenario + '.nc')):
     try:
       ds = netCDF4.Dataset(fname)
     except IOError as e:
@@ -125,7 +127,7 @@ def luh5(scenario, year, plus3):
 
   for lu in lus:
     rasters[lu.name] = lu
-    ref_path = 'ds/luh5/%s-recal.tif' % lu.name
+    ref_path = outfn('luh5', '%s-recal.tif' % lu.name)
     for band, intensity in enumerate(lui.intensities()):
       n = lu.name + '_' + intensity
       rasters[n] = lui.LUH5(lu.name, intensity)
@@ -139,7 +141,7 @@ def luh5(scenario, year, plus3):
     n = 'urban_' + intensity
     rasters[n] = lui.LUH5('urban', intensity)
     n2 = n + '_ref'
-    rasters[n2] = Raster(n2, 'ds/luh5/urban-recal.tif', band + 1)
+    rasters[n2] = Raster(n2, outfn('luh5', 'urban-recal.tif', band + 1))
 
   return rasters
 
@@ -168,18 +170,18 @@ def luh2(scenario, year, fnf):
                                     'young_secondary + intermediate_secondary + mature_secondary')
  
   ## Human population density and UN subregions
-  rasters['unSub'] = Raster('unSub', 'ds/luh2/un_subregions.tif')
-  rasters['un_code'] = Raster('un_codes', 'ds/luh2/un_codes.tif')
+  rasters['unSub'] = Raster('unSub', outfn('luh2', 'un_subregions.tif'))
+  rasters['un_code'] = Raster('un_codes', outfn('luh2', 'un_codes.tif'))
   #rasters.update(hpd.sps.raster(ssp, year))
   if year <= 2010:
-    rasters['hpd_ref'] = Raster('hpd_ref', 'ds/luh2/gluds00ag.tif')
+    rasters['hpd_ref'] = Raster('hpd_ref', outfn('luh2', 'gluds00ag.tif'))
     rasters['hpd'] = hpd.WPP('historical', year, utils.wpp_xls())
   else:
     rasters.update(hpd.sps.scale_grumps(ssp, year))
 
   ## Agricultural suitability
-  #rasters['ag_suit'] = Raster('ag_suit', 'ds/luh2/ag-suit-zero.tif')
-  rasters['ag_suit'] = Raster('ag_suit', 'ds/luh2/ag-suit-0.tif')
+  #rasters['ag_suit'] = Raster('ag_suit', outfn('luh2', 'ag-suit-zero.tif'))
+  rasters['ag_suit'] = Raster('ag_suit', outfn('luh2', 'ag-suit-0.tif'))
   
   ## NOTE: Pass max & min of log(HPD) so hi-res rasters can be processed
   ## incrementally.  Recording the max value here for when I create
@@ -192,9 +194,9 @@ def luh2(scenario, year, fnf):
                                     'scale(log(hpd + 1), 0.0, 1.0, 0.0, %f)' %
                                     maxHPD)
   rasters['logDTR_rs'] = Raster('logDTR_rs',
-                                'ds/luh2/roads-final.tif')
+                                outfn('luh2', 'roads-final.tif'))
   for fname in (utils.luh2_states(scenario),
-                'ds/luh2/secd-' + scenario + '.nc'):
+                outfn('luh2', 'secd-' + scenario + '.nc')):
     try:
       ds = netCDF4.Dataset(fname)
     except IOError as e:
@@ -210,9 +212,9 @@ def luh2(scenario, year, fnf):
   for lu in lus:
     rasters[lu.name] = lu
     if lu.name in ('annual', 'nitrogen', 'perennial', 'timber'):
-      ref_path = 'ds/luh2/%s-recal.tif' % lu.name
+      ref_path = outfn('luh2', '%s-recal.tif' % lu.name)
     else:
-      ref_path = 'ds/luh2/%s-recal.tif' % lu.syms[0]
+      ref_path = outfn('luh2', '%s-recal.tif' % lu.syms[0])
     for band, intensity in enumerate(lui.intensities()):
       n = lu.name + '_' + intensity
       n2 = n + '_ref'
@@ -223,7 +225,7 @@ def luh2(scenario, year, fnf):
         rasters[n] = lui.LUH2(lu.name, intensity)
         rasters[n2] = Raster(n2, ref_path, band + 1)
 
-  ref_path = 'ds/luh2/urban-recal.tif'
+  ref_path = outfn('luh2', 'urban-recal.tif')
   for band, intensity in enumerate(lui.intensities()):
     n = 'urban_' + intensity
     rasters[n] = lui.LUH2('urban', intensity)
@@ -266,8 +268,8 @@ def oneKm(year, scenario, hpd_trend):
   rasters['hpd_ref'] = Raster('hpd_ref',
                               os.path.join(utils.data_root(),
                                            'grump1.0/gluds00ag'))
-  rasters['unSub'] = Raster('unSub', 'ds/1km/un_subregions.tif')
-  rasters['un_code'] = Raster('un_codes', 'ds/1km/un_codes.tif')
+  rasters['unSub'] = Raster('unSub', outfn('1km', 'un_subregions.tif'))
+  rasters['un_code'] = Raster('un_codes', outfn('1km', 'un_codes.tif'))
   rasters['hpd'] = hpd.WPP(hpd_trend, year,
                            os.path.join(utils.data_root(),
                                         'wpp',
@@ -282,7 +284,7 @@ def oneKm(year, scenario, hpd_trend):
   rasters['logHPD_rs'] = SimpleExpr('logHPD_rs',
                                     'scale(log(hpd + 1), 0.0, 1.0, 0.0, 14.0)')
   rasters['logDistRd_rs'] = Raster('logDistRd_rs',
-                                   'ds/1km/roads-final.tif')
+                                   outfn('1km', 'roads-final.tif'))
 
   ## Land use intensity rasters
   for lu_type in lus:
