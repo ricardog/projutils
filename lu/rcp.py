@@ -186,27 +186,6 @@ def process(out_dir, years, maskf, what='all'):
       tiff_utils.from_array(data, oname, xsize, ysize, trans=geotrans,
                             proj = geoproj)
 
-def ref_to_path(ref_str):
-  if ref_str[0:3] != 'rcp':
-    raise ValueError("unknown reference string '%s'" % ref_str)
-  comps = ref_str.split(':')
-  if len(comps) == 1:
-    return os.path.join('ds/lu/{0}/'.format(*comps))
-  elif len(comps) == 2:
-    return os.path.join('ds/lu/{0}/{1}/'.format(*comps))
-  elif len(comps) == 3:
-    return os.path.join('ds/lu/{0}/{1}/%%s_{2}.tif'.format(*comps))
-  elif len(comps) == 4:
-    return os.path.join('ds/lu/{0}/{1}/{3}_{2}.tif'.format(*comps))
-  else:
-    raise ValueError("unknown reference type '%s'" % ref_str)
-
-def _ref_to_path(p):
-  if p[0] == '/':
-    p = p[1:]
-  base = os.path.join(__name__.replace('.', '/'), p)
-  return base
-
 def some_test_func():
   print('some_test_func called')
   
