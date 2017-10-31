@@ -39,6 +39,10 @@ def outdir(db=None):
     cmd.append('DIVERSITY_DB=%s' % db)
   return subprocess.check_output(cmd, shell=False).split('\n')[0]
 
+def lui_model_dir():
+  return os.path.join(data_root(), 'lui_models')
+
+@lrudecorator(10)
 def data_root():
   if platform.node() == 'vagrant':
     dr = '/data'

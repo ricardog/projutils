@@ -31,17 +31,17 @@ class LUH2(object):
     self._intensity = intensity
     self._inputs = []
     mod_name = model(name)
-    py = os.path.join(utils.outdir(), '%s.py' % mod_name)
+    py = os.path.join(utils.lui_model_dir(), '%s.py' % mod_name)
     if not os.path.isfile(py):
       raise RuntimeError('could not find python module for %s' % mod_name)
-    rds = os.path.join(utils.outdir(), '%s.rds' % mod_name)
+    rds = os.path.join(utils.lui_model_dir(), '%s.rds' % mod_name)
     if not os.path.isfile(rds):
       raise RuntimeError('could not find RDS file for %s' % mod_name)
     if os.path.getmtime(py) < os.path.getmtime(rds):
       raise RuntimeError('python module is older than RDS file for %s' % name)
     if intensity != 'minimal':
-      if utils.outdir() not in sys.path:
-        sys.path.append(utils.outdir())
+      if utils.lui_model_dir() not in sys.path:
+        sys.path.append(utils.lui_model_dir())
       self._pkg = importlib.import_module(mod_name)
       self._pkg_func = getattr(self._pkg, intensity)
       self._pkg_inputs = getattr(self._pkg, 'inputs')()

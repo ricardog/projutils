@@ -14,17 +14,17 @@ class OneKm(object):
     if name in ['plantation_pri', 'plantation_sec']:
       raise RuntimeError("unexpected lu type %s" % name)
 
-    py = os.path.join(utils.outdir(), '%s.py' % name)
+    py = os.path.join(utils.lui_model_dir(), '%s.py' % name)
     if not os.path.isfile(py):
       raise RuntimeError('could not find python module for %s' % name)
-    rds = os.path.join(utils.outdir(), '%s.rds' % name)
+    rds = os.path.join(utils.lui_model_dir(), '%s.rds' % name)
     if not os.path.isfile(rds):
       raise RuntimeError('could not find RDS file for %s' % name)
     if os.path.getmtime(py) < os.path.getmtime(rds):
       raise RuntimeError('python module is older than RDS file for %s' % name)
     if intensity != 'minimal':
-      if utils.outdir() not in sys.path:
-        sys.path.append(utils.outdir())
+      if utils.lui_model_dir() not in sys.path:
+        sys.path.append(utils.lui_model_dir())
       self._pkg = importlib.import_module(name)
       self._pkg_func = getattr(self._pkg, intensity + '_st')
       self._inputs += getattr(self._pkg, 'inputs')()

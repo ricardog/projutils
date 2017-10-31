@@ -8,11 +8,11 @@ import glm
 import utils
 
 lus = ['cropland', 'pasture', 'primary', 'secondary', 'urban']
-outdir = utils.outdir()
+model_dir = utils.lui_model_dir()
 
 for lu in lus:
   print('%s:' % lu)
-  with open(os.path.join(outdir, lu + '.py'), 'w') as ofile:
+  with open(os.path.join(model_dir, lu + '.py'), 'w') as ofile:
     fname = "out/_d5ed9724c6cb2c78b59707f69b3044e6/%s.rds" % lu
     models = robjects.r('models <- readRDS("%s")' % fname)
     for mm in models.items():
