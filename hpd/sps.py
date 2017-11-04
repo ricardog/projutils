@@ -5,8 +5,8 @@ from ..simpleexpr import SimpleExpr
 from .. import utils
 
 def raster(ssp, year):
-  if year < 2010 or year > 2100:
-    raise RuntimeError('year outside bounds (2010 <= %d <= 2100)' % year)
+  if year < 2015 or year > 2100:
+    raise RuntimeError('year outside bounds (2015 <= %d <= 2100)' % year)
   return {'hpd':
           Raster('hpd', 'netcdf:%s/luh2/sps.nc:%s' % (utils.outdir(), ssp),
                  band = year - 2009)}
