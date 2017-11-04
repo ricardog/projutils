@@ -62,7 +62,7 @@ def cpi_csv():
 
 def wpp_xls():
   return os.path.join(data_root(), 'wpp',
-                      'WPP2010_DB2_F01_TOTAL_POPULATION_BOTH_SEXES.xls')
+                      'WPP2017_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.xlsx')
 
 def luh2_prefix():
   return 'LUH2_v2f_beta_'
