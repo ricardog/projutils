@@ -173,7 +173,7 @@ def luh2(scenario, year, fnf):
   rasters['unSub'] = Raster('unSub', outfn('luh2', 'un_subregions.tif'))
   rasters['un_code'] = Raster('un_codes', outfn('luh2', 'un_codes.tif'))
   #rasters.update(hpd.sps.raster(ssp, year))
-  if year <= 2010:
+  if year < 2015:
     rasters['hpd_ref'] = Raster('hpd_ref', outfn('luh2', 'gluds00ag.tif'))
     rasters['hpd'] = hpd.WPP('historical', year, utils.wpp_xls())
   else:

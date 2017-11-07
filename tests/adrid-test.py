@@ -30,7 +30,7 @@ lui_dir = '/out/lui'
 # The baseline human population density data
 hpd_base = 'gluds00aghd.vrt'
 # UN WPP spreadsheet for projecting HPD
-wpp = '/data/wpp/WPP2010_DB2_F01_TOTAL_POPULATION_BOTH_SEXES.xls'
+wpp = '../../data/wpp/WPP2017_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.xlsx'
 # UN subregions raster
 un_sub = '../../data/un_sub'
 # UN code raster

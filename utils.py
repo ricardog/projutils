@@ -86,6 +86,13 @@ def luh2_scenarios():
   return tuple(re.sub('^' + luh2_prefix(), '', x).lower()
                for x in scenarios)
 
+def luh2_check_year(year, scenario):
+  if scenario == 'historical' and year > 850 and year < 2015:
+    return
+  if scenario != 'historical' and year >= 2015 and year <= 2100:
+    return
+  assert False, "Invalid (year, scenario) tuple (%d, %s)" % (year, scenario)
+    
 def luh2_scenario_ssp(scenario):
   ssp, rcp, iam = scenario.split('_')
   return ssp
