@@ -33,10 +33,16 @@ def mkpath(path):
       raise
 
 def outfn(res, *args):
+  """Return the name of an output file as a string.  The first argument is
+the 'resolution'.  All subsequent (optional) arguments are appended as a
+path (similar to calling os.path.join()).
+
+  """
   return os.path.join(outdir(), res, *args)
   
 @lrudecorator(10)
 def outdir():
+  """Returns the root of the output folder."""
   if 'OUTDIR' in os.environ:
     outdir = os.environ['OUTDIR']
   elif os.path.isdir('/out'):
@@ -47,10 +53,18 @@ def outdir():
   return os.path.abspath(outdir)
 
 def lui_model_dir():
+  """Returns the directory where to find the land-use intensity models.
+Assumed to be OUTDIR/lui_models.
+
+  """
   return os.path.join(data_root(), 'lui_models')
 
 @lrudecorator(10)
 def data_root():
+  """Returns the root of the data folder.  All data sources are assumed
+relative to this folder.
+
+  """
   if 'DATA_ROOT' in os.environ:
     dr = os.environ['DATA_ROOT']
   elif os.path.isdir('/data'):
@@ -69,10 +83,12 @@ def cpi_csv():
                       'cpi.csv')
 
 def wpp_xls():
+  """Returns file name of UN WPP spreadsheet."""
   return os.path.join(data_root(), 'wpp',
                       'WPP2017_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.xlsx')
 
 def luh2_prefix():
+  """Prefix of all LUH2 data file names."""
   return 'LUH2_v2f_'
 
 def luh2_dir():
