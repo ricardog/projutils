@@ -73,15 +73,16 @@ def wpp_xls():
                       'WPP2017_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.xlsx')
 
 def luh2_prefix():
-  return 'LUH2_v2f_beta_'
+  return 'LUH2_v2f_'
 
 def luh2_dir():
   return os.path.join(data_root(), 'luh2_v2')
 
 def luh2_scenarios():
-  scenarios = filter(lambda p: (p == 'historical' or
-                                p[0:17] == 'LUH2_v2f_beta_SSP'),
-                     os.listdir(luh2_dir()))
+  prefix = luh2_prefix() + 'SSP'
+  l = len(prefix)
+  scenarios = sorted(filter(lambda p: (p == 'historical' or p[0:l] == prefix),
+                            os.listdir(luh2_dir())))
   return tuple(re.sub('^' + luh2_prefix(), '', x).lower()
                for x in scenarios)
 
