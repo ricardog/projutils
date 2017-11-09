@@ -1,3 +1,4 @@
+import functools
 import itertools
 import sys
 
@@ -16,8 +17,8 @@ class Node(object):
       return False
     if hash(self) == hash(other):
       return True
-    ret = reduce(lambda x,y: x and y, map(lambda x: x[0] == x[1],
-                                          itertools.izip(self.args, other.args)))
+    ret = functools.reduce(lambda x,y: x and y, map(lambda x: x[0] == x[1],
+                                          zip(self.args, other.args)))
     return ret
   
   def __ne__(self, other):

@@ -42,7 +42,7 @@ def main(fname, band, title, save):
     fig.savefig(save, transparent=True)
     plt.show()
   else:
-    ax = show((src, band), cmap=palette, title=title)
+    ax = show((src, band), cmap=palette, title=title, vmin=min, vmax=max)
 
 if __name__ == '__main__':
   main()

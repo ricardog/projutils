@@ -283,8 +283,17 @@ def oneKm(year, scenario, hpd_trend):
   ## 1km  => 872073.500 / 13.678628988329825
   rasters['logHPD_rs'] = SimpleExpr('logHPD_rs',
                                     'scale(log(hpd + 1), 0.0, 1.0, 0.0, 14.0)')
+  rasters['LogHPDPlus1_cs'] = SimpleExpr('logHPDPlus1_cs',
+                                    '(log(hpd + 1) - 3.396125) / 1.863318')
+  rasters['studyMeanHPD_cs'] = SimpleExpr('studyMeanHPD_cs', '3.3396125')
   rasters['logDistRd_rs'] = Raster('logDistRd_rs',
                                    outfn('1km', 'roads-final.tif'))
+  rasters['RdDens_50km'] = Raster('RdDens_50km', 
+                                    os.path.join(utils.data_root(), 
+                                                 'road-density', 'fake.tif'))
+                                                 #'road-density', 'roadDensity50km.tif'))
+  rasters['CRootRdDensPlus1_50km_cs'] = SimpleExpr('CRootRdDensPlus1_50km_cs',
+          '(log(RdDens_50km + 1) - 0.388077) / 0.1593538')
 
   ## Land use intensity rasters
   for lu_type in lus:
@@ -326,9 +335,9 @@ def predictify(mod):
     f = lambda x: ui.predictify(x, 'UseIntensity')
     mod.equation.transform(f)
     
-  for prefix in ('UI', 'UImin2'):
+  for prefix in ('UI', 'UImin'):
     if prefix in syms:
-      if lui.luh5.is_luh5(syms[prefix], prefix):
+      if None and lui.luh5.is_luh5(syms[prefix], prefix):
         print('predictify %s as luh5' % prefix)
         f = lambda x: lui.luh5.predictify(x, prefix)
       elif lui.luh2.is_luh2(syms[prefix], prefix):
@@ -339,7 +348,7 @@ def predictify(mod):
         f = lambda x: lui.rcp.predictify(x, prefix)
       mod.equation.transform(f)
   if 'LandUse' in syms:
-    if lu.luh5.is_luh5(syms['LandUse'], 'LandUse'):
+    if None and lu.luh5.is_luh5(syms['LandUse'], 'LandUse'):
       print('predictify LandUse as luh5')
       f = lambda x: lu.luh5.predictify(x, 'LandUse')
     elif lui.luh2.is_luh2(syms['LandUse'], 'LandUse'):
