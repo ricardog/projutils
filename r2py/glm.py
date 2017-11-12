@@ -6,7 +6,7 @@ import rpy2.robjects as robjects
 import rpy2.rinterface as rinterface
 
 from . import reval
-from . import ri2pi
+from .ri2pi import ri2pi
 from . import rparser
 from .tree import Node, Operator
 
@@ -67,7 +67,7 @@ class GLM():
         # created a var node and now get called with the child of a var
         # node we just created.
         return n
-      ms = filter(lambda x: x == n, cache.values())
+      ms = tuple(filter(lambda x: x == n, cache.values()))
       if ms:
         assert len(ms) == 1, 'matched too many nodes'
         m = ms[0]
