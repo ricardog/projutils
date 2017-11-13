@@ -118,13 +118,14 @@ def get_min_max(ds, algo='mincut'):
   high = 0.0
   lower = 0.02
   higher = 0.98
-  bins = 256
+  bins = 2048
   bands = ds.RasterCount
   for b in range(1, bands + 1):
     band = ds.GetRasterBand(b)
-    stats = band.GetStatistics(True, True)
-    histo = band.GetHistogram(stats[0], stats[1], bins)
-    count = sum(filter(lambda x: not x == 0, histo))
+    stats = band.GetStatistics(False, True)
+    histo = band.GetHistogram(min=stats[0], max=stats[1], buckets=bins,
+                              include_out_of_range = True, approx_ok = False)
+    count = sum(histo)
     cutoff = (count * lower, count * higher)
     step = (stats[1] - stats[0]) / float(bins)
     if low is None:
