@@ -2,13 +2,13 @@
 
 import click
 from copy import copy
+import numpy as np
+import numpy.ma as ma
 import rasterio
-from rasterio.plot import show
+from rasterio.plot import show, plotting_extent
 import gdal
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
-import pdb
 
 import projections.tiff_utils as tu
 
@@ -19,6 +19,22 @@ def get_min_max(fname):
   print('[%6.3f : %6.3f]' % (min, max))
   return min, max
 
+def too_big(src):
+  if src.height * src.width > 64<<20:
+    return True
+  return False
+
+def read_array(src, band):
+  if too_big(src):
+    width = 2880
+    height = int(width * src.height * 1.0 / src.width)
+  else:
+    width = src.width
+    height = src.height
+  out = np.empty((height, width), dtype = src.dtypes[band - 1])
+  src.read(band, masked=True, out=out)
+  return ma.masked_equal(out, src.nodatavals[band - 1])
+
 @click.command()
 @click.argument('fname', type=click.Path(dir_okay=False))
 @click.option('-b', '--band', type=int, default=1,
@@ -27,24 +43,19 @@ def get_min_max(fname):
               help='Save the resulting image to disk.')
 @click.option('-t', '--title',
               help='Title of the image (default: file name)')
-@click.option('--max', type=float,
+@click.option('--vmax', type=float,
               help='Upper bound for color display.  Any cells less than ' +
               'this value will be shown in red.  By default it will ' +
               'compute the maximum such that 98% of the cells are below ' +
               'this value.')
-@click.option('--min', type=float,
+@click.option('--vmin', type=float,
               help='Lower bound for color display.  Any cells less than ' +
               'this value will be shown in black.  By default it will' +
               'compute the minimum such that 2% of the cells are above ' +
               'this value.')
 @click.option('--colorbar/--no-colorbar', default=True,
               help='Display/hide a colorbar with the value range.')
-def main(fname, band, title, save, max, min, colorbar):
-  rmin, rmax = get_min_max(fname)
-  if max is None:
-    max = rmax
-  if min is None:
-    min = rmin
+def main(fname, band, title, save, vmax, vmin, colorbar):
   if title is None:
     title = fname
   palette = copy(plt.cm.viridis)
@@ -54,12 +65,23 @@ def main(fname, band, title, save, max, min, colorbar):
   palette.set_bad('w', 1.0)
 
   src = rasterio.open(fname)
-  #data = src.read(band, masked=True)
+  if too_big:
+    data = read_array(src, band)
+    rmin = data.min()
+    rmax = data.max()
+  else:
+    rmin, rmax = get_min_max(fname)
+
+  if vmax is None:
+    vmax = rmax
+  if vmin is None:
+    vmin = rmin
+
   if save:
     fig = plt.figure()
-    #plt.gca().set_title(title)
     ax = plt.gca()
-    show((src, band), ax=ax, cmap=palette, title=title, vmin=min, vmax=max)
+    show(data, ax=ax, cmap=palette, title=title, vmin=min, vmax=max,
+         extent=plotting_extent(src))
     fig.tight_layout()
     ax.axis('off')
     fig.savefig(save, transparent=True)
@@ -67,7 +89,8 @@ def main(fname, band, title, save, max, min, colorbar):
   else:
     fig = plt.figure()
     ax = plt.gca()
-    show((src, band), ax=ax, cmap=palette, title=title, vmin=min, vmax=max)
+    show(data, ax=ax, cmap=palette, title=title, vmin=vmin, vmax=vmax,
+         extent=plotting_extent(src))
     if colorbar:
       divider = make_axes_locatable(ax)
       cax = divider.append_axes("bottom", size="5%", pad=0.25)
