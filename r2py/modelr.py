@@ -36,7 +36,7 @@ class Model(object):
     ins = map(lambda x: np.array([0.0]) if x == 'logHPD_rs' \
               else np.array([1.0]) if x == 'logDTR_rs' \
               else np.array([0.0]), self._inputs)
-    func_name = re.sub(r'[ \-.$]', '_', self._pkg.__name__)
+    func_name = getattr(self._pkg, 'func_name')()
     func = getattr(self._pkg, func_name)
     return func(*ins)
 
@@ -50,7 +50,7 @@ class Model(object):
     ins = map(lambda x: np.linspace(0, 1.2, 13) if x == 'logHPD_rs' \
               else np.full(13, 1.0, dtype=np.float32) if x == 'logDTR_rs' \
               else np.zeros((13), dtype=np.float32), self._inputs)
-    func_name = re.sub(r'[ \-.$]', '_', self._pkg.__name__)
+    func_name = getattr(self._pkg, 'func_name')()
     func = getattr(self._pkg, func_name)
     return func(*ins)
   
@@ -60,10 +60,10 @@ class Model(object):
 def read_py(fname):
   path, name = os.path.split(fname)
   pkg_name, ext = os.path.splitext(name)
-  func_name = re.sub(r'[ \-.$]', '_', pkg_name)
   if path not in sys.path:
     sys.path.append(path)
   pkg = importlib.import_module(pkg_name)
+  func_name = getattr(pkg, 'func_name')()
   func = getattr(pkg, func_name + '_st')
   inputs = getattr(pkg, 'inputs')()
   out_name = getattr(pkg, 'output')()
