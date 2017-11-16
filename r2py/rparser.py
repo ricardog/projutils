@@ -96,6 +96,10 @@ def parse(text):
       assert len(l) == 2, "unexpected number of arguments to exp"
       args = walk(l[1])
       return Node(Operator('exp'), [args])
+    if l[0] == 'inv_logit':
+      assert len(l) == 2, "unexpected number of arguments to inv_logit"
+      args = walk(l[1])
+      return Node(Operator('inv_logit'), [args])
       
 
     ## Only binary operators left
