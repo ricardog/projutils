@@ -11,6 +11,7 @@ from .. import utils
 
 LUI_MODEL_MAP = {'annual': 'cropland',
                  'nitrogen': 'cropland',
+                 'cropland': 'cropland',
                  'pasture': 'pasture',
                  'perennial': 'cropland',
                  'primary': 'primary',
