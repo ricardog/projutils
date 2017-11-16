@@ -286,7 +286,8 @@ import projections.r2py.poly as poly
   fdecl = "def %s_st(stab):" % fname
   iodecls = ["stab['%s']" % v for v in sorted(set(inputs))]
   fun2 = fdecl + "\n  return %s(%s)" % (fname, ", ".join(iodecls))
-  return prelude + "\n\n\n" + fun1 + "\n\n\n" + fun2 + "\n\n"
+  fun3 = "def func_name(): return '%s'" % fname
+  return prelude + "\n\n\n" + fun1 + "\n\n\n" + fun2 + "\n\n\n" + fun3 + "\n\n"
 
 def to_pyx(root, fname):
   lsyms = find_syms(root)
@@ -307,7 +308,8 @@ ctypedef np.float_t DTYPE_t
   fdecl =  ("@cython.boundscheck(False)\n" +
             "def %s(%s):" % (fname, ', '.join(iodecls)))
   fun1 = fdecl + "\n  " + ";".join(decls + [expr])
-  return prelude + "\n\n\n" + fun1 + "\n\n"
+  fun2 = "def func_name(): return '%s'" % fname
+  return prelude + "\n\n\n" + fun1 + "\n\n\n" + fun2 + "\n\n"
 
 # rreplace('(), (), ()', ',', ' ->', 1)
 def rreplace(src, what, repl, num=1):
@@ -381,6 +383,9 @@ def inputs():
 
 def output():
   return "{out_name}"
+
+def func_name():
+  return "{fname}"
 
 '''.format(prelude = impts if not child else '',
            body = body,
