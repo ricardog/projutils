@@ -6,6 +6,7 @@ from ..r2py import rparser
 
 LU = {'annual': 'c3ann + c4ann',
       'nitrogen': 'c3nfx',
+      'cropland': 'c3ann + c3ann + c3nfx',
       'pasture': 'pastr',
       'perennial': 'c3per + c4per',
       'primary': 'primf + primn',
@@ -74,6 +75,16 @@ def is_luh2(syms, prefix):
     except AssertionError as e:
       return False
   return True
+
+def as_contrast(root, prefix):
+  if isinstance(root, str) and re.match(prefix, root):
+    #import pdb; pdb.set_trace()
+    newr = root.replace(prefix, '')
+    newr = re.sub(r'^.*-',  '', newr)
+    newr = newr.replace('Managed ', '')
+    newr = newr.replace(' Minimal', '')
+    return _predictify(newr, '')
+  return root
 
 def predictify(root, prefix):
   if isinstance(root, str) and re.match(prefix, root):
