@@ -80,14 +80,14 @@ def main(fname, band, title, save, vmax, vmin, colorbar):
   if save:
     fig = plt.figure()
     ax = plt.gca()
-    show(data, ax=ax, cmap=palette, title=title, vmin=min, vmax=max,
+    show(data, ax=ax, cmap=palette, title=title, vmin=vmin, vmax=vmax,
          extent=plotting_extent(src))
     fig.tight_layout()
     ax.axis('off')
     fig.savefig(save, transparent=True)
     plt.show()
   else:
-    fig = plt.figure()
+    fig = plt.figure(dpi=150)
     ax = plt.gca()
     show(data, ax=ax, cmap=palette, title=title, vmin=vmin, vmax=vmax,
          extent=plotting_extent(src))
