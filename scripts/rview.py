@@ -65,13 +65,13 @@ def main(fname, band, title, save, vmax, vmin, colorbar):
   palette.set_bad('w', 1.0)
 
   src = rasterio.open(fname)
-  if too_big:
-    data = read_array(src, band)
+  data = read_array(src, band)
+  if too_big(src):
     rmin = data.min()
     rmax = data.max()
   else:
     rmin, rmax = get_min_max(fname)
-
+    
   if vmax is None:
     vmax = rmax
   if vmin is None:
