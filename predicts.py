@@ -157,6 +157,7 @@ def luh2(scenario, year, fnf):
   
   lus = [SimpleExpr('annual', 'c3ann + c4ann'),
          SimpleExpr('nitrogen', 'c3nfx'),
+         SimpleExpr('cropland', 'c3ann + c4ann + c3nfx'),
          SimpleExpr('pasture', 'pastr'),
          SimpleExpr('perennial', 'c3per + c4per'),
          SimpleExpr('primary', 'prim' + fnf),
@@ -182,6 +183,9 @@ def luh2(scenario, year, fnf):
   ## Agricultural suitability
   #rasters['ag_suit'] = Raster('ag_suit', outfn('luh2', 'ag-suit-zero.tif'))
   rasters['ag_suit'] = Raster('ag_suit', outfn('luh2', 'ag-suit-0.tif'))
+  rasters['ag_suit_rs'] = SimpleExpr('ag_suit_rs', 'ag_suit')
+  rasters['logAdjDist'] = SimpleExpr('logAdjDist', '0')
+  rasters['cubrtEnvDist'] = SimpleExpr('cubrtEnvDist', '0')
   
   ## NOTE: Pass max & min of log(HPD) so hi-res rasters can be processed
   ## incrementally.  Recording the max value here for when I create
@@ -193,6 +197,8 @@ def luh2(scenario, year, fnf):
   rasters['logHPD_rs'] = SimpleExpr('logHPD_rs',
                                     'scale(log(hpd + 1), 0.0, 1.0, 0.0, %f)' %
                                     maxHPD)
+  rasters['LogHPD_s2'] = SimpleExpr('LogHPD_s2', 'log(hpd + 1)')
+  rasters['LogHPD_diff'] = SimpleExpr('LogHPD_diff', '0 - LogHPD_s2')
   rasters['logDTR_rs'] = Raster('logDTR_rs',
                                 outfn('luh2', 'roads-final.tif'))
   for fname in (utils.luh2_states(scenario),
@@ -211,7 +217,7 @@ def luh2(scenario, year, fnf):
 
   for lu in lus:
     rasters[lu.name] = lu
-    if lu.name in ('annual', 'nitrogen', 'perennial', 'timber'):
+    if lu.name in ('annual', 'cropland', 'nitrogen', 'perennial', 'timber'):
       ref_path = outfn('luh2', '%s-recal.tif' % lu.name)
     else:
       ref_path = outfn('luh2', '%s-recal.tif' % lu.syms[0])
@@ -351,11 +357,17 @@ def predictify(mod):
     if None and lu.luh5.is_luh5(syms['LandUse'], 'LandUse'):
       print('predictify LandUse as luh5')
       f = lambda x: lu.luh5.predictify(x, 'LandUse')
-    elif lui.luh2.is_luh2(syms['LandUse'], 'LandUse'):
+    elif lu.luh2.is_luh2(syms['LandUse'], 'LandUse'):
       print('predictify LandUse as luh2')
       f = lambda x: lu.luh2.predictify(x, 'LandUse')
     else:
       print('predictify LandUse as rcp')
       f = lambda x: lu.rcp.predictify(x, 'LandUse')
     mod.equation.transform(f)
+  if 'Contrast' in syms:
+    print('predictify Contrasts as luh2')
+    f = lambda x: lu.luh2.as_contrast(x, 'Contrast')
+    mod.equation.transform(f)
+    
+    
   mod.equation.transform(nodots)
