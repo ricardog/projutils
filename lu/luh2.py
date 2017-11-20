@@ -34,7 +34,7 @@ def tree(lu):
   if lu not in trees:
     trees[lu] = reval.make_inputs(rparser.parse(expr(lu)))
   return trees[lu]
-  
+
 def func(lu):
   if lu not in funcs:
     lokals = {}
@@ -47,7 +47,7 @@ def syms(lu):
     root = tree(lu)
     symbols[lu] = reval.find_inputs(root)
   return symbols[lu]
-  
+
 def is_luh2(syms, prefix):
   for sym in syms:
     newr = _predictify(sym, prefix)
@@ -61,7 +61,7 @@ def _predictify(sym, prefix):
   newr = newr.replace(' forest', '_pri')
   newr = newr.replace('Managed ', '')
   newr = newr.replace(' secondary', '_secondary')
-  newr = re.sub(r'(Minimal|Light|Intense) use',  "\\1", newr)
+  newr = re.sub(r'(Minimal|Light|Intense) use', "\\1", newr)
   newr = newr.lower()
   name = newr.split(' ')[0]
   newr = newr.replace(' ', '_')
@@ -72,15 +72,14 @@ def is_luh2(syms, prefix):
   for sym in syms:
     try:
       newr = _predictify(sym, prefix)
-    except AssertionError as e:
+    except AssertionError:
       return False
   return True
 
 def as_contrast(root, prefix):
   if isinstance(root, str) and re.match(prefix, root):
-    #import pdb; pdb.set_trace()
     newr = root.replace(prefix, '')
-    newr = re.sub(r'^.*-',  '', newr)
+    newr = re.sub(r'^.*-', '', newr)
     newr = newr.replace('Managed ', '')
     newr = newr.replace(' Minimal', '')
     return _predictify(newr, '')
