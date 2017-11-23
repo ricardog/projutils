@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-import click
 from copy import copy
+
+import click
 import numpy as np
 import numpy.ma as ma
 import rasterio
@@ -71,23 +72,33 @@ def main(fname, band, title, save, vmax, vmin, colorbar):
     rmax = data.max()
   else:
     rmin, rmax = get_min_max(fname)
-    
+
   if vmax is None:
     vmax = rmax
   if vmin is None:
     vmin = rmin
 
+  dpi = 100.0
+  size = [src.width / dpi, src.height / dpi]
+  if colorbar:
+    size[1] += 70 / dpi
+    pass
+
   if save:
-    fig = plt.figure()
+    fig = plt.figure(figsize=size, dpi=dpi)
     ax = plt.gca()
     show(data, ax=ax, cmap=palette, title=title, vmin=vmin, vmax=vmax,
          extent=plotting_extent(src))
     fig.tight_layout()
-    ax.axis('off')
-    fig.savefig(save, transparent=True)
+    #ax.axis('off')
+    if colorbar:
+      divider = make_axes_locatable(ax)
+      cax = divider.append_axes("bottom", size="5%", pad=0.25)
+      plt.colorbar(ax.images[0], cax=cax, orientation='horizontal')
+    fig.savefig(save, transparent=False)
     plt.show()
   else:
-    fig = plt.figure(dpi=150)
+    fig = plt.figure(figsize=size, dpi=dpi)
     ax = plt.gca()
     show(data, ax=ax, cmap=palette, title=title, vmin=vmin, vmax=vmax,
          extent=plotting_extent(src))
@@ -96,6 +107,6 @@ def main(fname, band, title, save, vmax, vmin, colorbar):
       cax = divider.append_axes("bottom", size="5%", pad=0.25)
       plt.colorbar(ax.images[0], cax=cax, orientation='horizontal')
     plt.show()
-    
+
 if __name__ == '__main__':
   main()
