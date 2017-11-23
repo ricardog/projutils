@@ -34,6 +34,8 @@ class Model(object):
   @property
   def intercept(self):
     ins = map(lambda x: np.array([0.0]) if x == 'logHPD_rs' \
+              else np.array([0.0]) if x == 'LogHPD_s2' \
+              else np.array([0.0]) if x == 'LogHPD_diff' \
               else np.array([1.0]) if x == 'logDTR_rs' \
               else np.array([0.0]), self._inputs)
     func_name = getattr(self._pkg, 'func_name')()
@@ -41,17 +43,20 @@ class Model(object):
     return func(*ins)
 
   def partial(self, df):
-    shape = df.values()[0].shape
-    dtype = df.values()[0].dtype
+    shape = tuple(df.values())[0].shape
+    dtype = tuple(df.values())[0].dtype
     for arg in self._inputs:
       if arg not in df:
         df[arg] = np.zeros(shape, dtype=dtype)
     return self.eval(df)
     ins = map(lambda x: np.linspace(0, 1.2, 13) if x == 'logHPD_rs' \
+              else np.linspace(0, 10.02, 13) if x == 'LogHPD_s2' \
+              else np.linspace(0, -10.02, 13) if x == 'LogHPD_diff' \
               else np.full(13, 1.0, dtype=np.float32) if x == 'logDTR_rs' \
               else np.zeros((13), dtype=np.float32), self._inputs)
     func_name = getattr(self._pkg, 'func_name')()
     func = getattr(self._pkg, func_name)
+    import pdb; pdb.set_trace()
     return func(*ins)
   
   def eval(self, df):

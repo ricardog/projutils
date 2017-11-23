@@ -186,7 +186,8 @@ def luh2(scenario, year, fnf):
   rasters['ag_suit_rs'] = SimpleExpr('ag_suit_rs', 'ag_suit')
   rasters['logAdjDist'] = SimpleExpr('logAdjDist', '0')
   rasters['cubrtEnvDist'] = SimpleExpr('cubrtEnvDist', '0')
-  
+  rasters['studymean_logHPD_rs'] = SimpleExpr('studymean_logHPD_rs', '0')
+
   ## NOTE: Pass max & min of log(HPD) so hi-res rasters can be processed
   ## incrementally.  Recording the max value here for when I create
   ## other functions for other resolutions.
@@ -242,7 +243,7 @@ def luh2(scenario, year, fnf):
     name = '%s_minimal_and_light' % lu
     rasters[name] = SimpleExpr(name, '%s_minimal + %s_light' % (lu, lu))
 
-  for lu in ('mature_secondary', 'nitrogen', 'rangelands'):
+  for lu in ('mature_secondary', 'nitrogen', 'rangelands', 'urban'):
     name = '%s_light_and_intense' % lu
     rasters[name] = SimpleExpr(name, '%s_light + %s_intense' % (lu, lu))
 
