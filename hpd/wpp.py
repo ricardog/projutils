@@ -1,17 +1,14 @@
 #!/usr/bin/env python
 
-import click
-from joblib import memory
-import numpy as np
-import numpy.ma as ma
-import os
-import pandas as pd
 import tempfile
 
-from .. import tiff_utils
-from .. import utils
+from joblib import memory
+import numpy as np
+import pandas as pd
 
-memcache = memory.Memory(cachedir=tempfile.mkdtemp(prefix='hpd-wpp'),
+from .. import tiff_utils
+
+MEMCACHE = memory.Memory(cachedir=tempfile.mkdtemp(prefix='hpd-wpp'),
                          verbose=0, mmap_mode='r')
 
 class WPP(object):
@@ -55,11 +52,11 @@ def remap(what, table, nomatch=None):
 def check_years(sheet, years):
   if years is None:
     return set()
-  available = set(sheet.iloc[14,5:].astype(int).tolist())
+  available = set(sheet.iloc[14, 5:].astype(int).tolist())
   yset = set(years)
   return yset - available
 
-@memcache.cache
+@MEMCACHE.cache
 def get_sheets(trend, wpp):
   trend = 'estimates' if trend == 'historical' else trend
   xls = pd.ExcelFile(wpp)
@@ -71,15 +68,15 @@ def get_sheets(trend, wpp):
   sheets = [pd.read_excel(wpp, name) for name in names]
   for name, sheet in zip(names, sheets):
     ## FIXME: I store the name of the sheet (or tab) in cell (0, 0)
-    ## becuase memcache will not preserve metadata attributes.  Once
+    ## becuase Memcache will not preserve metadata attributes.  Once
     ## this gets fixed in pandas, it would be cleaner to create an
     ## attribute (name) that stores the sheet name.
     sheet.ix[0, 0] = name.lower()
   return sheets
 
 def get_years(sheet):
-  return sheet.iloc[14,5:].astype(int).tolist()
-  
+  return sheet.iloc[14, 5:].astype(int).tolist()
+
 def project(trend, sheet, countries, grumps, mask, year, nodata):
   ## Some of the cells representing the year are treated as strings and
   ## some as integers so check for both.
@@ -87,12 +84,12 @@ def project(trend, sheet, countries, grumps, mask, year, nodata):
                       sheet.iloc[14].isin([str(year)]))
   if not np.any(col):
     raise ValueError
-  ccode = sheet.iloc[15:,4].astype(int).tolist()
+  ccode = sheet.iloc[15:, 4].astype(int).tolist()
   hist = sheet.ix[15:, col]
   if trend == 'historical':
-    ref = sheet.ix[15:,u'Unnamed: 57']
-  else :
-    ref = sheet.ix[15:,u'Unnamed: 5']
+    ref = sheet.ix[15:, u'Unnamed: 57']
+  else:
+    ref = sheet.ix[15:, u'Unnamed: 5']
   pop = hist.divide(ref, axis="index").astype('float32').values
 
   mydict = dict((v, pop[ii]) for ii, v in enumerate(ccode))
@@ -104,6 +101,3 @@ def project(trend, sheet, countries, grumps, mask, year, nodata):
     my_mask = unknown_mask
   new_pop = np.multiply(grumps, growth)
   return np.where(my_mask, nodata, new_pop)
-
-def regularize(*args):
-  tiff_utils.regularize(args)
