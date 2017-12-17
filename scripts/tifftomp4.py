@@ -20,6 +20,9 @@ from ..progressbar import ProgressBar
 from ..mp4_utils import to_mp4
 from .. import tiff_utils
 
+def parse_fname2(fname):
+  return os.path.splitext(os.path.basename(fname))[0].rsplit('-', 2)
+
 def get_stats(files):
   import gdal
   low = []
@@ -58,15 +61,16 @@ def convert(title, fps, palette, band, oname, files):
   #bands = stats[4]
   #nframes = sum(bands)
   nframes = len(files)
-  cnorm = colors.Normalize(vmin=3.5, vmax=5.0)
+  cnorm = colors.Normalize(vmin=0.7, vmax=1.07)
   with rasterio.open(files[0]) as src:
     data = src.read(band, masked=True)
   for idx, img, text in to_mp4(title, oname, nframes,
                                data, 'year', fps, cnorm=cnorm):
+    scenario, metric, year = parse_fname2(files[idx])
     ds = rasterio.open(files[idx])
     data = ds.read(band, masked=True)
     img.set_array(data)
-    text.set_text('year')
+    text.set_text(year)
 
 def parse_args():
   parser = argparse.ArgumentParser(description='Convert a series of raster ' +
