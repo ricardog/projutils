@@ -29,7 +29,7 @@ def to_mp4(title, oname, frames, data, text=None, fps=10, palette=None, cnorm=No
   ax1.axes.get_xaxis().set_visible(False)
   plt.tight_layout()
   plt.subplots_adjust(left=0.0, right=1.0, top=1.0, bottom=0.0)
-  for spine in ax1.spines.itervalues():
+  for spine in ax1.spines.values():
     spine.set_visible(False)
   if cnorm is None:
     cnorm = colors.Normalize(vmin=0, vmax=1)
