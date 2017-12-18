@@ -1,7 +1,7 @@
 import numpy.lib
 import numpy as np
 import pandas as pd
-import cPickle as pickle
+import _pickle as pickle
 
 def save_pandas(fname, data):
     '''Save DataFrame or Series
