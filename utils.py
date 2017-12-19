@@ -103,7 +103,7 @@ def luh2_scenarios():
                for x in scenarios)
 
 def luh2_check_year(year, scenario):
-  if scenario == 'historical' and year > 850 and year < 2015:
+  if scenario == 'historical' and year >= 850 and year < 2015:
     return
   if scenario != 'historical' and year >= 2015 and year <= 2100:
     return
