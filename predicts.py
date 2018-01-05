@@ -146,26 +146,23 @@ def luh5(scenario, year, plus3):
   return rasters
 
 
-def luh2(scenario, year, fnf):
+def luh2(scenario, year):
   rasters = {}
   if scenario not in utils.luh2_scenarios():
     raise ValueError('Unknown scenario %s' % scenario)
   ssp = scenario[0:4]
-  
-  if fnf not in ('f', 'n'):
-    raise ValueError('Pass f => forested / n => non-forested')
   
   lus = [SimpleExpr('annual', 'c3ann + c4ann'),
          SimpleExpr('nitrogen', 'c3nfx'),
          SimpleExpr('cropland', 'c3ann + c4ann + c3nfx'),
          SimpleExpr('pasture', 'pastr'),
          SimpleExpr('perennial', 'c3per + c4per'),
-         SimpleExpr('primary', 'prim' + fnf),
+         SimpleExpr('primary', 'primf + primn'),
          SimpleExpr('rangelands', 'range'),
          SimpleExpr('timber', '0'),
-         SimpleExpr('young_secondary', 'secdy' + fnf),
-         SimpleExpr('intermediate_secondary', 'secdi' + fnf),
-         SimpleExpr('mature_secondary', 'secdm' + fnf),
+         SimpleExpr('young_secondary', 'secdyf + secdyn'),
+         SimpleExpr('intermediate_secondary', 'secdif + secdin'),
+         SimpleExpr('mature_secondary', 'secdmf + secdmn'),
   ]
   rasters['secondary'] = SimpleExpr('secondary',
                                     'young_secondary + intermediate_secondary + mature_secondary')
@@ -194,7 +191,7 @@ def luh2(scenario, year, fnf):
   ## 0.50 =>  20511.541 / 9.92874298232494
   ## 0.25 =>  41335.645 / 10.62948048177454 (10.02 for Sam)
   ## 1km  => 872073.500 / 13.678628988329825
-  maxHPD = 10.02083 if fnf == 'n' else 9.823253
+  maxHPD = 10.02083
   rasters['logHPD_rs'] = SimpleExpr('logHPD_rs',
                                     'scale(log(hpd + 1), 0.0, 1.0, 0.0, %f)' %
                                     maxHPD)
@@ -242,7 +239,8 @@ def luh2(scenario, year, fnf):
   for lu in ('annual', 'pasture'):
     name = '%s_minimal_and_light' % lu
     rasters[name] = SimpleExpr(name, '%s_minimal + %s_light' % (lu, lu))
-
+  rasters['mature_secondary_intense_and_light'] = SimpleExpr('mature_secondary_intense_and_light', 'mature_secondary_light_and_intense')
+  
   for lu in ('mature_secondary', 'nitrogen', 'rangelands', 'urban'):
     name = '%s_light_and_intense' % lu
     rasters[name] = SimpleExpr(name, '%s_light + %s_intense' % (lu, lu))
@@ -253,6 +251,7 @@ def luh2(scenario, year, fnf):
     rasters[intensity] = SimpleExpr(intensity, expr)
 
   return rasters
+
 
 def oneKm(year, scenario, hpd_trend):
   rasters = {}
@@ -320,7 +319,7 @@ def rasterset(lu_src, scenario, year, hpd_trend='medium'):
   if lu_src == 'luh5':
     return luh5(scenario, year, hpd_trend)
   if lu_src == 'luh2':
-    return luh2(scenario, year, hpd_trend)
+    return luh2(scenario, year)
   if lu_src == '1km':
     return oneKm(year, scenario, hpd_trend)
 
