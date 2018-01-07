@@ -195,8 +195,8 @@ def luh2(scenario, year):
   rasters['logHPD_rs'] = SimpleExpr('logHPD_rs',
                                     'scale(log(hpd + 1), 0.0, 1.0, 0.0, %f)' %
                                     maxHPD)
-  rasters['LogHPD_s2'] = SimpleExpr('LogHPD_s2', 'log(hpd + 1)')
-  rasters['LogHPD_diff'] = SimpleExpr('LogHPD_diff', '0 - LogHPD_s2')
+  rasters['logHPD_s2'] = SimpleExpr('LogHPD_s2', 'log(hpd + 1)')
+  rasters['logHPD_diff'] = SimpleExpr('logHPD_diff', '0 - logHPD_s2')
   rasters['logDTR_rs'] = Raster('logDTR_rs',
                                 outfn('luh2', 'roads-final.tif'))
   for fname in (utils.luh2_states(scenario),
