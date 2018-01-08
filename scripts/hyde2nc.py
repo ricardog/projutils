@@ -15,11 +15,11 @@ import rasterio
 
 import pdb
 
-import projections.geotools as geotools
-import projections.utils as utils
+from .. import geotools
+from .. import utils
 
 def adbc_conv(ss):
-  m = re.match(r'(\d+)(ad)_pop.zip', ss)
+  m = re.match(r'(\d+)(ad)_pop.zip', ss, re.IGNORECASE)
   if m:
     y = int(m.group(1))
     if m.group(2) == 'bc':
@@ -42,7 +42,7 @@ def get_years(hdir):
               help='Start from given year (default: 0AD)')
 def main(version, outdir, start_year):
   oname = os.path.join(outdir, 'hyde-%s.nc' % version)
-  variables = tuple([(layer, 'f4', '1', -9999, 'time')
+  variables = tuple([(layer, 'f4', 'ppl/km^2', -9999, 'time')
                      for layer in utils.hyde_variables()])
   years = get_years(utils.hyde_dir(version))
   with Dataset(oname, 'w') as out:
@@ -54,7 +54,7 @@ def main(version, outdir, start_year):
           with rasterio.open(utils.hyde_raw(version, year, variable)) as ds:
             data = ds.read(1, masked=True)
             out.variables[variable][idx, :, :] = data
-            
+          
 def init_nc(dst_ds, src_ds, steps, variables):
   # Set attributes
   dst_ds.setncattr('Conventions', u'CF-1.5')
@@ -87,15 +87,15 @@ def init_nc(dst_ds, src_ds, steps, variables):
   times.axis = 'T'
 
   # Assign data to variables
-  bb = src_ds.bounds
-  latitudes[:] = np.linspace(bb[1], bb[3], src_ds.height)
-  longitudes[:] = np.linspace(bb[0], bb[2], src_ds.width)
+  ul = src_ds.affine * (0.5, 0.5)
+  lr = src_ds.affine * (src_ds.width - 0.5, src_ds.height - 0.5)
+  latitudes[:] = np.linspace(ul[1], lr[1], src_ds.height)
+  longitudes[:] = np.linspace(ul[0], lr[0], src_ds.width)
   times[:] = steps
 
   srs = osr.SpatialReference()
   srs.ImportFromWkt(geotools.WGS84_WKT)
-  #src_trans = (-180.0, 0.25, 0.0, 90.0, 0.0, -0.25)
-  src_trans = src_ds.transform
+  src_trans = src_ds.affine.to_gdal()
   crs.grid_mapping_name = 'latitude_longitude'
   crs.spatial_ref = srs.ExportToWkt()
   crs.GetTransform = ' '.join(tuple(map(str, src_trans)))
