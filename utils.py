@@ -153,6 +153,8 @@ def hyde_varions():
   return('32', '31_final')
 
 def hyde_dir(version):
+  if version == '32':
+    return os.path.join(data_root(), 'hyde' + version, 'baseline')
   return os.path.join(data_root(), 'hyde' + version)
 
 def hyde_area():
