@@ -26,8 +26,6 @@ def scale_grumps(year):
   rasters = {}
   ref_band = years().index(REFERENCE_YEAR)
   year_band = years().index(year)
-  print("ref : %d" % ref_band)
-  print("year: %d" % year_band)
   rasters['grumps'] = Raster('grumps', '%s/luh2/gluds00ag.tif' % utils.outdir())
   rasters['hpd_ref'] = Raster('hpd_ref',
                               'netcdf:%s/luh2/hyde.nc:popd' % utils.outdir(),
