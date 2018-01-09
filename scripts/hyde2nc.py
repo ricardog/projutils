@@ -44,12 +44,12 @@ def main(version, outdir, start_year):
   oname = os.path.join(outdir, 'hyde-%s.nc' % version)
   variables = tuple([(layer, 'f4', 'ppl/km^2', -9999, 'time')
                      for layer in utils.hyde_variables()])
-  years = get_years(utils.hyde_dir(version))
+  years = tuple(filter(lambda yy: yy >= start_year,
+                       get_years(utils.hyde_dir(version))))
   with Dataset(oname, 'w') as out:
     with rasterio.open(utils.hyde_area()) as area_ds:
       init_nc(out, area_ds, years, variables)
       for idx, year in enumerate(years):
-        print(year)
         for variable in utils.hyde_variables():
           with rasterio.open(utils.hyde_raw(version, year, variable)) as ds:
             data = ds.read(1, masked=True)
@@ -61,7 +61,7 @@ def init_nc(dst_ds, src_ds, steps, variables):
   dst_ds.setncattr('GDAL', u'GDAL 1.11.3, released 2015/09/16')
 
   # Create dimensions
-  dst_ds.createDimension('time', None)
+  dst_ds.createDimension('time', len(steps))
   dst_ds.createDimension('lat', src_ds.height)
   dst_ds.createDimension('lon', src_ds.width)
   
