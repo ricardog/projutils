@@ -146,7 +146,7 @@ def luh5(scenario, year, plus3):
   return rasters
 
 
-def luh2(scenario, year):
+def luh2(scenario, year, hpd_trend):
   rasters = {}
   if scenario not in utils.luh2_scenarios():
     raise ValueError('Unknown scenario %s' % scenario)
@@ -172,8 +172,11 @@ def luh2(scenario, year):
   rasters['un_code'] = Raster('un_codes', outfn('luh2', 'un_codes.tif'))
   #rasters.update(hpd.sps.raster(ssp, year))
   if year < 2015:
-    rasters['hpd_ref'] = Raster('hpd_ref', outfn('luh2', 'gluds00ag.tif'))
-    rasters['hpd'] = hpd.WPP('historical', year, utils.wpp_xls())
+    if hpd_trend == 'wpp':
+      rasters['hpd_ref'] = Raster('hpd_ref', outfn('luh2', 'gluds00ag.tif'))
+      rasters['hpd'] = hpd.WPP('historical', year, utils.wpp_xls())
+    else:
+      rasters.update(hpd.hyde.scale_grumps(year))
   else:
     rasters.update(hpd.sps.scale_grumps(ssp, year))
 
@@ -319,7 +322,8 @@ def rasterset(lu_src, scenario, year, hpd_trend='medium'):
   if lu_src == 'luh5':
     return luh5(scenario, year, hpd_trend)
   if lu_src == 'luh2':
-    return luh2(scenario, year)
+    assert hpd_trend in ('wpp', 'medium')
+    return luh2(scenario, year, hpd_trend)
   if lu_src == '1km':
     return oneKm(year, scenario, hpd_trend)
 

@@ -122,7 +122,7 @@ def main(version):
     fname = '%s/hyde/hyde-%s.nc' % (utils.outdir(), version)
     #fname = 'netcdf:%s/hyde/hyde-%s.nc:popc' % (utils.outdir(), version)
     uncodes = '%s/luh2/un_codes-full.tif' % utils.outdir()
-    oname = '%s/luh2/hyde-%s.nc' % (utils.outdir(), version)
+    oname = '%s/luh2/hyde.nc' % utils.outdir()
     variables = [('popd', 'f4', 'ppl/km^2', -9999)]
     affine, lats, lons, res, cfudge = get_transform(uncodes,
                                                     'netcdf:' + fname + ':popc')
