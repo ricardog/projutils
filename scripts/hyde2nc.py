@@ -49,11 +49,13 @@ def main(version, outdir, start_year):
   with Dataset(oname, 'w') as out:
     with rasterio.open(utils.hyde_area()) as area_ds:
       init_nc(out, area_ds, years, variables)
-      for idx, year in enumerate(years):
-        for variable in utils.hyde_variables():
-          with rasterio.open(utils.hyde_raw(version, year, variable)) as ds:
-            data = ds.read(1, masked=True)
-            out.variables[variable][idx, :, :] = data
+      with click.progressbar(years, length=len(years)) as bar:
+        for year in bar:
+          idx = years.index(year)
+          for variable in utils.hyde_variables():
+            with rasterio.open(utils.hyde_raw(version, year, variable)) as ds:
+              data = ds.read(1, masked=True)
+              out.variables[variable][idx, :, :] = data
           
 def init_nc(dst_ds, src_ds, steps, variables):
   # Set attributes
