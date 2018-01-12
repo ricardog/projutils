@@ -8,8 +8,8 @@ from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import Converter
 from rpy2.robjects.conversion import localconverter
 
-import lmermod
-import glmermod
+from . import lmermod
+from . import glmermod
 
 def ri2ro_s4(obj):
   if 'lmerMod' in obj.rclass:
