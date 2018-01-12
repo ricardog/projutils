@@ -9,7 +9,6 @@ from ..r2py import glm
 from ..r2py import lmermod
 from ..r2py import glmermod
 from .. import predicts
-from .. import utils
 
 def doit(obj):
   if 'lmerMod' in obj.rclass:
