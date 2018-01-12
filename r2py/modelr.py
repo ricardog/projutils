@@ -83,5 +83,5 @@ def load(path):
     #print("loading %s" % pypath)
     return read_py(pypath)
   print("loading %s" % path)
-  import rds
+  import projections.rds as rds
   return rds.read(path)
