@@ -92,9 +92,7 @@ def get_transform(r1, r2):
   lons = np.linspace(ul[0], lr[0], width)
   cratio = np.prod(dst.res) / np.prod(src.res)
   #cratio = 1.0
-  static = rasterio.open('netcdf:%s:carea' %
-                         os.path.join(utils.luh2_dir(),
-                                      'staticData_quarterdeg.nc'))
+  static = rasterio.open(utils.luh2_static('carea'))
   carea = static.read(1, window=static.window(*src.bounds))
   rcs = (np.sin(np.radians(lats + dst.res[0] / 2.0)) -
          np.sin(np.radians(lats - dst.res[0] / 2.0))) * \

@@ -149,6 +149,38 @@ def sps(scenario, year):
   fname = os.path.join(path, "%s.nc" % name)
   return 'netcdf:%s/%s.nc:%s' % (path, name, name)
 
+def hyde_varions():
+  return('32', '31_final')
+
+def hyde_dir(version):
+  if version == '32':
+    return os.path.join(data_root(), 'hyde' + version, 'baseline')
+  return os.path.join(data_root(), 'hyde' + version)
+
+def hyde_area():
+  return os.path.join(data_root(), 'hyde31_final', 'garea_cr.asc')
+
+def hyde_variables():
+  return ('popc', 'popd', 'rurc', 'uopp', 'urbc')
+
+def hyde_raw(version, year, variable):
+  if year < 0:
+    suffix = 'bc'
+    year *= -1
+  else:
+    suffix = 'ad'
+  if version == '32':
+    suffix = suffix.upper()
+    p = os.path.join(data_root(),
+                     'hyde' + version, 'baseline',
+                     '%d%s_pop.zip' % (year, suffix))
+  else:
+    p = os.path.join(data_root(),
+                     'hyde' + version, '%d%s_pop.zip' % (year, suffix))
+  if variable:
+    return 'zip:' + p + '!%s_%d%s.asc' % (variable, year, suffix.upper())
+  return p
+
 def run(cmd, sem=None):
   try:
     if sem is None:
