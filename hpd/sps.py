@@ -1,8 +1,42 @@
+
 import os
+
+import numpy as np
+import numpy.ma as ma
+from pylru import lrudecorator
+import rasterio
 
 from ..rasterset import Raster
 from ..simpleexpr import SimpleExpr
 from .. import utils
+
+REFERENCE_YEAR = 2010
+
+class Sps(object):
+  def __init__(self, year):
+    self._year = year
+    return
+
+  @property
+  def year(self):
+    return self._year
+
+  @property
+  def syms(self):
+    return ['grumps', 'hpd_ref', 'hpd_proj']
+
+  def eval(self, df):
+    div = ma.where(df['hpd_ref'] == 0, 1, df['hpd_ref'])
+    return ma.where(df['hpd_ref'] == 0,
+                    df['hpd_proj'],
+                    df['grumps'] * df['hpd_proj'] / div)
+
+@lrudecorator(10)
+def years(ssp):
+  with rasterio.open('netcdf:%s/luh2/sps.nc:%s' % (utils.outdir(),
+                                                   ssp)) as ds:
+    return tuple(map(lambda idx: int(ds.tags(idx)['NETCDF_DIM_time']),
+                     ds.indexes))
 
 def raster(ssp, year):
   if year < 2015 or year > 2100:
@@ -13,15 +47,16 @@ def raster(ssp, year):
   
 def scale_grumps(ssp, year):
   rasters = {}
-  rasters['grumps'] = Raster('grumps', '%s/luh2/gluds00ag.tif' % utils.outdir())
+  if year not in years(ssp):
+    raise RuntimeError('year %d not available in %s projection' % (ssp, year))
+  rasters['grumps'] = Raster('grumps', '%s/luh2/historical-hpd-2010.tif' % utils.outdir())
   rasters['hpd_ref'] = Raster('hpd_ref',
                               'netcdf:%s/luh2/sps.nc:%s' % (utils.outdir(),
                                                             ssp),
-                              band = 1)
+                              band=years(ssp).index(REFERENCE_YEAR) + 1)
   rasters['hpd_proj'] = Raster('hpd_proj',
                                'netcdf:%s/luh2/sps.nc:%s' % (utils.outdir(),
                                                              ssp),
-                               band = year - 2009)
-  rasters['hpd'] = SimpleExpr('hpd',
-                              'grumps * (hpd_proj / (hpd_ref + 0.01))')
+                               band=years(ssp).index(year) + 1)
+  rasters['hpd'] = Sps(year)
   return rasters
