@@ -6,7 +6,6 @@ from pylru import lrudecorator
 import rasterio
 
 from ..rasterset import Raster
-from ..simpleexpr import SimpleExpr
 from .. import utils
 
 REFERENCE_YEAR = 2000
