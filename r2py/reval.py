@@ -97,6 +97,9 @@ def to_repr(root):
                                               root.args[3], root.args[4])
     raise ValueError("unexpected number of arguments for scale: %s" %
                      ', '.join(map(str, root.args)))
+  if root.type is Operator('pow'):
+    return '(pow(%s, %s))' % (to_repr(root.args[0]),
+                              to_repr(root.args[1]))
   if root.type is Operator('max'):
     return '(max(%s, %s))' % (to_repr(root.args[0]),
                               to_repr(root.args[1]))
@@ -186,6 +189,9 @@ def to_expr(root, ctx=None):
                                                    root.args[3], root.args[4])
     raise ValueError("unexpected number of arguments for scale: %s" %
                      ', '.join(map(str, root.args)))
+  if root.type is Operator('pow'):
+    return '(np.power(%s, %s))' % (recurse(root.args[0]),
+                                     recurse(root.args[1]))
   if root.type is Operator('max'):
     return '(np.maximum(%s, %s))' % (recurse(root.args[0]),
                                      recurse(root.args[1]))

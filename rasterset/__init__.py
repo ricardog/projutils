@@ -114,6 +114,8 @@ class RasterSet(object):
     self._levels = [[] for x in range(nlevels + 1)]
     for k, v in ordered:
       self._levels[v].append(k)
+    self._levels[0].sort(key=lambda a: -1 if isinstance(self._data[a].source,
+                                                        Raster) else 1)
 
   def to_dot(self):
     import pdb; pdb.set_trace()
@@ -225,7 +227,7 @@ class RasterSet(object):
       with rasterio.open(path, 'w', **meta) as dst:
         with click.progressbar(ctx.block_windows(), iters) as bar:
           for win in bar:
-            height, width = window_shape(win)
+            height, width = (win[0][1] - win[0][0], win[1][1] - win[1][0])
             out = self._eval(ctx, win)
             dst.write(out.filled(meta['nodata']), window = win, indexes = 1)
             ctx.msgs = False
@@ -239,7 +241,7 @@ class RasterSet(object):
     # high for this problem because threads start competing for the GIL.
     # Increasing the clock size helps, at the cost of higher memory
     # utilization.
-    num_workers = 1
+    num_workers = multiprocessing.cpu_count()
     ctx.msgs = False
 
     def jobs():

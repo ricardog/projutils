@@ -86,7 +86,7 @@ def parse(text):
       assert len(l) == 2, "unexpected number of arguments to %s" % l[0]
       args = walk(l[1])
       return Node(Operator(l[0]), [args])
-    if l[0] in ('max', 'min'):
+    if l[0] in ('max', 'min', 'pow'):
       assert len(l) == 2, "unexpected number of arguments to %s" % l[0]
       assert len(l[1]) == 2, "unexpected number of arguments to %s" % l[0]
       left = walk(l[1][0])
