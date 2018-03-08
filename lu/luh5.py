@@ -29,6 +29,7 @@ def types(plus3=False):
 def _predictify(root, prefix):
   newr = root.replace(prefix, '')
   newr = newr.replace(' Vegetation', '')
+  newr = newr.replace('_Vegetation', '')
   newr = newr.replace(' vegetation', '')
   newr = newr.replace(' forest', '_pri')
   newr = re.sub(r'(Mature|Intermediate|Young)',  "\\1", newr)
@@ -44,6 +45,16 @@ def is_luh5(syms, prefix):
     except AssertionError as e:
       return False
   return True
+
+def as_contrast(root, prefix):
+  if isinstance(root, str) and re.match(prefix, root):
+    newr = root.replace(prefix, '')
+    newr = re.sub(r'^.*-', '', newr)
+    newr = newr.replace('Managed ', '')
+    newr = newr.replace(' Minimal', '')
+    newr = newr.replace(' use', '')
+    return _predictify(newr, '')
+  return root
 
 def predictify(root, prefix):
   if isinstance(root, str) and re.match(prefix, root):

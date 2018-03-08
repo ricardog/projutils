@@ -87,9 +87,10 @@ class LUH5(object):
 def _predictify(root, prefix):
   newr = root.replace(prefix, '')
   newr = newr.replace(' Vegetation', '')
+  newr = newr.replace('_Vegetation', '')
   newr = newr.replace(' vegetation', '')
   newr = newr.replace(' forest', '_pri')
-  newr = re.sub(r'(Minimal|Light|Intense) use',  "\\1", newr)
+  newr = re.sub(r'(Minimal|Light|Intense)[ _]use',  "\\1", newr)
   newr = re.sub(r'(Mature|Intermediate|Young)',  "\\1", newr)
   newr = newr.lower()
   newr = newr.replace(' ', '_')
@@ -99,9 +100,12 @@ def _predictify(root, prefix):
 
 def is_luh5(syms, prefix):
   for sym in syms:
+    if prefix == 'Contrast':
+      sym = re.sub(r'^.*-', '', sym)
     try:
       newr = _predictify(sym, prefix)
     except AssertionError as e:
+      print('lui.is_luh5 failed on %s' % sym)
       return False
   return True
 

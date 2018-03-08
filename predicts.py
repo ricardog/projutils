@@ -358,7 +358,7 @@ def predictify(mod):
         f = lambda x: lui.rcp.predictify(x, prefix)
       mod.equation.transform(f)
   if 'LandUse' in syms:
-    if None and lu.luh5.is_luh5(syms['LandUse'], 'LandUse'):
+    if lu.luh5.is_luh5(syms['LandUse'], 'LandUse'):
       print('predictify LandUse as luh5')
       f = lambda x: lu.luh5.predictify(x, 'LandUse')
     elif lu.luh2.is_luh2(syms['LandUse'], 'LandUse'):
@@ -369,8 +369,12 @@ def predictify(mod):
       f = lambda x: lu.rcp.predictify(x, 'LandUse')
     mod.equation.transform(f)
   if 'Contrast' in syms:
-    print('predictify Contrasts as luh2')
-    f = lambda x: lu.luh2.as_contrast(x, 'Contrast')
+    if lui.luh5.is_luh5(syms['Contrast'], 'Contrast'):
+      print('predictify Contrasts as luh5')
+      f = lambda x: lu.luh5.as_contrast(x, 'Contrast')
+    else:
+      print('predictify Contrasts as luh2')
+      f = lambda x: lu.luh2.as_contrast(x, 'Contrast')
     mod.equation.transform(f)
     
     
