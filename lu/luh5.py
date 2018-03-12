@@ -53,7 +53,13 @@ def as_contrast(root, prefix):
     newr = newr.replace('Managed ', '')
     newr = newr.replace(' Minimal', '')
     newr = newr.replace(' use', '')
-    return _predictify(newr, '')
+    predictified = _predictify(newr, '')
+    if predictified == 'primary':
+      ## If the right-hand side of a contrast is "primary" assume it
+      ## refers to primary_light_and_intense since primary_minimal is
+      ## on the LHS. 
+      predictified = 'primary_light_and_intense'
+    return predictified
   return root
 
 def predictify(root, prefix):

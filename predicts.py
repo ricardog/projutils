@@ -143,6 +143,9 @@ def luh5(scenario, year, plus3):
     n2 = n + '_ref'
     rasters[n2] = Raster(n2, outfn('luh5', 'urban-recal.tif', band + 1))
 
+  name = '%s_light_and_intense' % 'primary'
+  rasters[name] = SimpleExpr(name, 'primary_light + primary_intense')
+    
   return rasters
 
 
@@ -293,7 +296,7 @@ def oneKm(year, scenario, hpd_trend):
   rasters['logHPD_rs'] = SimpleExpr('logHPD_rs',
                                     'scale(log(hpd + 1), 0.0, 1.0, 0.0, 14.0)')
   rasters['LogHPDPlus1_cs'] = SimpleExpr('logHPDPlus1_cs',
-                                    '(log(hpd + 1) - 3.396125) / 1.863318')
+                                         '(log(hpd + 1) - 3.396125) / 1.863318')
   rasters['studyMeanHPD_cs'] = SimpleExpr('studyMeanHPD_cs', '3.3396125')
   rasters['logDistRd_rs'] = Raster('logDistRd_rs',
                                    outfn('1km', 'roads-final.tif'))
@@ -314,6 +317,10 @@ def oneKm(year, scenario, hpd_trend):
         rasters[n] = SimpleExpr(n, '0')
       else:
         rasters[n] = lui.OneKm(lu_type.name, intensity)
+
+  name = '%s_light_and_intense' % 'primary'
+  rasters[name] = SimpleExpr(name, 'primary_light + primary_intense')
+
   return rasters
 
 def rasterset(lu_src, scenario, year, hpd_trend='medium'):
