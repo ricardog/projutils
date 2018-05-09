@@ -377,10 +377,10 @@ def predictify(mod):
     mod.equation.transform(f)
   if 'Contrast' in syms:
     if lui.luh5.is_luh5(syms['Contrast'], 'Contrast'):
-      print('predictify Contrasts as luh5')
-      f = lambda x: lu.luh5.as_contrast(x, 'Contrast')
+      print('predictify Contrasts as lui.luh5')
+      f = lambda x: lui.luh5.as_contrast(x, 'Contrast')
     else:
-      print('predictify Contrasts as luh2')
+      print('predictify Contrasts as lu.luh2')
       f = lambda x: lu.luh2.as_contrast(x, 'Contrast')
     mod.equation.transform(f)
     

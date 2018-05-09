@@ -98,13 +98,28 @@ def _predictify(root, prefix):
   assert name in lu.luh5.types() or name in lu.luh5.types(True), 'unknown land use type %s' % root
   return newr
 
+def as_contrast(root, prefix):
+  if isinstance(root, str) and re.match(prefix, root):
+    newr = root.replace(prefix, '')
+    newr = re.sub(r'^.*-', '', newr)
+    newr = newr.replace('Managed ', '')
+    newr = newr.replace(' use', '')
+    predictified = _predictify(newr, '')
+    if predictified == 'primary':
+      ## If the right-hand side of a contrast is "primary" assume it
+      ## refers to primary_light_and_intense since primary_minimal is
+      ## on the LHS. 
+      predictified = 'primary_light_and_intense'
+    return predictified
+  return root
+
 def is_luh5(syms, prefix):
   for sym in syms:
     if prefix == 'Contrast':
       sym = re.sub(r'^.*-', '', sym)
     try:
-      newr = _predictify(sym, prefix)
-    except AssertionError as e:
+      _ = _predictify(sym, prefix)
+    except AssertionError:
       print('lui.is_luh5 failed on %s' % sym)
       return False
   return True
