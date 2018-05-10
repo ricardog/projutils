@@ -1,9 +1,13 @@
+import datetime
+
 import numpy as np
 import pandas as pd
 
 import rpy2.robjects as robjects
 import rpy2.rinterface as rinterface
 from rpy2.robjects import pandas2ri
+
+import pdb
 
 def ri2pi(obj):
   if obj is None:
@@ -15,6 +19,9 @@ def ri2pi(obj):
                robjects.vectors.StrVector):
     vect = np.asarray(obj)
     assert vect.ndim == 1, "R vector has more than 1 dimension"
+    if 'Date' in tuple(obj.rclass):
+      origin = datetime.date(1970, 1, 1)
+      vect = tuple(map(lambda v: origin + datetime.timedelta(int(v)), vect))
     if obj.names == rinterface.NULL:
       # Unnamed vector, return data as np array or as a scalar
       res = vect[0] if len(vect) == 1 else vect
@@ -26,7 +33,10 @@ def ri2pi(obj):
   elif klass == robjects.vectors.StrVector:
     raise RuntimeError
   elif klass == robjects.vectors.FactorVector:
-    raise RuntimeError
+    values = map(lambda v: 0 if v[1] == obj.NAvalue else v[1], obj.items())
+    res = pandas.Categorical.from_codes(numpy.asarray(tuple(values)) - 1,
+                                        categories = obj.do_slot('levels'),
+                                        ordered = 'ordered' in obj.rclass)
   elif klass == robjects.Formula:
     res = obj
   elif klass == rinterface.RNULLType:
@@ -56,8 +66,14 @@ def ri2pi(obj):
             res[name] = mat
         elif 'factor' in klasses:
           res[name] = pandas2ri.ri2py(item[1])
+        elif 'logical' in klasses:
+          res[name] = pandas2ri.ri2py(item[1])
+        elif 'Date' in klasses:
+          #raise RuntimeError('untested Date conversion')
+          origin = datetime.date(1970, 1, 1)
+          res[name] = tuple(map(lambda v: origin + datetime.timedelta(int(v)), item[1]))
         else:
-          raise RuntimeError('unknown data class')
+          raise RuntimeError('unknown data class %s' % klasses)
   elif klass == robjects.vectors.Matrix:
     res = np.array(obj)
   else:
