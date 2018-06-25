@@ -94,7 +94,10 @@ def _predictify(root, prefix):
   newr = re.sub(r'(Mature|Intermediate|Young)',  "\\1", newr)
   newr = newr.lower()
   newr = newr.replace(' ', '_')
-  name = newr.rsplit('_', 1)[0]
+  if newr == 'plantation_pri':
+    name = newr
+  else:
+    name = newr.rsplit('_', 1)[0]
   assert name in lu.luh5.types() or name in lu.luh5.types(True), 'unknown land use type %s' % root
   return newr
 
@@ -104,6 +107,7 @@ def as_contrast(root, prefix):
     newr = re.sub(r'^.*-', '', newr)
     newr = newr.replace('Managed ', '')
     newr = newr.replace(' use', '')
+    newr = newr.replace(' forest', '_pri')
     predictified = _predictify(newr, '')
     if predictified == 'primary':
       ## If the right-hand side of a contrast is "primary" assume it
