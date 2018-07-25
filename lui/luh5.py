@@ -8,6 +8,7 @@ import sys
 
 from .. import lu
 from .. import utils
+from projections.r2py.tree import Node, Operator
 
 class LUH5(object):
   def __init__(self, name, intensity):
@@ -115,6 +116,14 @@ def as_contrast(root, prefix):
       ## on the LHS. 
       predictified = 'primary_light_and_intense'
     return predictified
+  if (isinstance(root, Node) and root.type is Operator('in') and
+      re.match(prefix, root.args[0])):
+    name = root.args[0].replace(prefix, '')
+    lhs, rhs = name.split('-', 2)
+    if lhs.lower() not in ['primary minimal', 'primary vegetation minimal',
+                           'primary vegetation minimal use']:
+      print('ignoring %s' % root.args[0])
+      return 0.0
   return root
 
 def is_luh5(syms, prefix):
