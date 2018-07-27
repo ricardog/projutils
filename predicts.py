@@ -119,7 +119,7 @@ def luh5(scenario, year, plus3):
       print("Error: opening '%s'" % fname)
       raise IOError("Error: opening '%s'" % fname)
     ds_vars = set(ds.variables.keys())
-    names = set(reduce(lambda x,y: x + y, [lu.syms for lu in lus], ['urban']))
+    names = set(reduce(lambda x,y: x + y, [list(lu.syms) for lu in lus], ['urban']))
     for name in set.intersection(names, ds_vars):
       band = year - 849 if scenario == 'historical' else year - 2014
       rasters[name] = Raster(name, "netcdf:%s:%s" % (fname, name),
@@ -141,7 +141,7 @@ def luh5(scenario, year, plus3):
     n = 'urban_' + intensity
     rasters[n] = lui.LUH5('urban', intensity)
     n2 = n + '_ref'
-    rasters[n2] = Raster(n2, outfn('luh5', 'urban-recal.tif', band + 1))
+    rasters[n2] = Raster(n2, outfn('luh5', 'urban-recal.tif'), band + 1)
 
   name = '%s_light_and_intense' % 'primary'
   rasters[name] = SimpleExpr(name, 'primary_light + primary_intense')
@@ -354,7 +354,7 @@ def predictify(mod):
     
   for prefix in ('UI', 'UImin'):
     if prefix in syms:
-      if None and lui.luh5.is_luh5(syms[prefix], prefix):
+      if False and lui.luh5.is_luh5(syms[prefix], prefix):
         print('predictify %s as luh5' % prefix)
         f = lambda x: lui.luh5.predictify(x, prefix)
       elif lui.luh2.is_luh2(syms[prefix], prefix):
