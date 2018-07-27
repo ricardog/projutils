@@ -81,7 +81,7 @@ def load(path):
       os.path.getmtime(pypath) > os.path.getmtime(path)):
     #print("loading %s" % pypath)
     return read_py(pypath)
-  print("compiing %s" % path)
+  print("compiling %s" % path)
   return read_py(_compile(path))
 
 def _compile(fname):
