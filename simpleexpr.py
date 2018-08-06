@@ -17,13 +17,18 @@ class SimpleExpr():
   def syms(self):
     return reval.find_inputs(self.tree)
   
-  def eval(self, df):
+  def eval(self, df, window=None):
     try:
       res = self.func(df)
     except KeyError as e:
       print("Error: input '%s' not defined" % e)
       raise e
     if not isinstance(res, np.ndarray):
-      res = ma.masked_array(np.full(tuple(df.values())[0].shape, res,
-                                    dtype=np.float32))
+      if not window:
+        res = ma.masked_array(np.full(tuple(df.values())[0].shape, res,
+                                      dtype=np.float32))
+      else:
+        h = window[0][1] - window[0][0]
+        w = window[1][1] - window[1][0]
+        res = ma.masked_array(np.full((h, w), res, dtype=np.float32))
     return res
