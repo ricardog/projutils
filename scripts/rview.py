@@ -7,13 +7,13 @@ import numpy as np
 import numpy.ma as ma
 import rasterio
 from rasterio.plot import show, plotting_extent
-import gdal
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import projections.tiff_utils as tu
 
 def get_min_max(fname):
+  import gdal
   ds = gdal.Open(fname)
   min, max = tu.get_min_max(ds)
   del ds
@@ -79,7 +79,7 @@ def main(fname, band, title, save, vmax, vmin, colorbar):
     vmin = rmin
 
   dpi = 100.0
-  size = [src.width / dpi, src.height / dpi]
+  size = [data.shape[2] / dpi, data.shape[1] / dpi]
   if colorbar:
     size[1] += 70 / dpi
     pass
