@@ -106,6 +106,10 @@ def to_repr(root):
   if root.type is Operator('min'):
     return '(min(%s, %s))' % (to_repr(root.args[0]),
                               to_repr(root.args[1]))
+  if root.type is Operator('clip'):
+    return '(clip(%s, %s, %s))' % (to_repr(root.args[0]),
+                                   to_repr(root.args[1]),
+                                   to_repr(root.args[2]))
   if root.type is Operator('inv_logit'):
     expr = to_repr(root.args[0])
     return '(exp(%s) / (1 + exp(%s)))' % (expr, expr)
@@ -198,6 +202,10 @@ def to_expr(root, ctx=None):
   if root.type is Operator('min'):
     return '(np.minimum(%s, %s))' % (recurse(root.args[0]),
                                      recurse(root.args[1]))
+  if root.type is Operator('clip'):
+    return '(np.clip(%s, %s, %s))' % (recurse(root.args[0]),
+                                      recurse(root.args[1]),
+                                      recurse(root.args[2]))
   if root.type is Operator('inv_logit'):
     expr = recurse(root.args[0])
     return '(np.exp(%s) / (1 + np.exp(%s)))' % (expr, expr)
