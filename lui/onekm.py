@@ -58,14 +58,20 @@ class OneKm(object):
     return self._inputs
 
   def eval(self, df):
+    if self._name in ['plantation_pri', 'plantation_sec']:
+      return df[self._name] / 3
+    if self._name[-10:] == '_secondary':
+      return ma.where(df['secondary'] <= 0, 0,
+                      df['secondary_' + self.intensity] * df[self._name] /
+                      (df['secondary'] + 1e-5))
     if self.intensity == 'minimal':
-      res = (1 - df[self.as_intense] - df[self.as_light])
-    else:
-      res = self._pkg_func(df)
-      res[np.where(np.isnan(res))] = 1.0
-      res = np.clip(res, 0, 1)
-      if self.intensity == 'light':
-        res = np.where(df[self.as_intense] + res > 1,
-                       1 - df[self.as_intense], res)
+      res = (df[self._name] - df[self.as_intense] - df[self.as_light])
+      return res
+    res = self._pkg_func(df)
+    res[np.where(np.isnan(res))] = 1.0
+    res = np.clip(res, 0, 1)
+    if self.intensity == 'light':
+      intense = df[self.as_intense] / (df[self._name] + 1e-10)
+      res = np.where(intense + res > 1, 1 - intense, res)
     res *= df[self._name]
     return res
