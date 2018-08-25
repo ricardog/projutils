@@ -128,6 +128,8 @@ def parse(text):
     return Node(Operator(op), (left, right))
 
   ### FIXME: hack
+  if not isinstance(text, str):
+    text = str(text)
   new_text = re.sub('newrange = c\((\d), (\d+)\)', '\\1, \\2', text)
   new_text = new_text.replace('rescale(', 'scale(')
   nodes = PARSER.parseString(new_text, parseAll=True)
