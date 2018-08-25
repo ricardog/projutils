@@ -43,8 +43,17 @@ class Model(object):
     return func(*ins)
 
   def partial(self, df):
-    shape = tuple(df.values())[0].shape
-    dtype = tuple(df.values())[0].dtype
+    arrays = tuple(filter(lambda x: isinstance(x, np.ndarray), df.values()))
+    if arrays:
+      assert len(set(map(lambda x: x.shape, arrays))) == 1
+      shape = arrays[0].shape
+      dtype = arrays[0].dtype
+    else:
+      shape = (1, )
+      dtype = float
+    for k, v in df.items():
+      if not isinstance(v, np.ndarray):
+        df[k] = np.full(shape, v, dtype=dtype)
     for arg in self._inputs:
       if arg not in df:
         df[arg] = np.zeros(shape, dtype=dtype)
