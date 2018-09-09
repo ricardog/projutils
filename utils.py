@@ -78,6 +78,14 @@ def gdp_csv():
   return os.path.join(data_root(), 'econ',
                       'gdp-per-capita.csv')
 
+def eci_csv():
+  return os.path.join(data_root(), 'econ',
+                      'eci_country_rankings_changed.csv')
+
+def wjp_xls():
+  return os.path.join(data_root(), 'rule-of-law',
+                      'FINAL_2017-2018_wjp_rule_of_law_index_HISTORICAL_DATA_FILE.xlsx')
+
 def cpi_csv():
   return os.path.join(data_root(), 'econ',
                       'cpi.csv')
