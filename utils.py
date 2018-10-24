@@ -90,6 +90,13 @@ def cpi_csv():
   return os.path.join(data_root(), 'econ',
                       'cpi.csv')
 
+def energy_c_csv():
+  return os.path.join(data_root(), 'econ',
+                      'energy-consumption.csv')
+def energy_p_csv():
+  return os.path.join(data_root(), 'econ',
+                      'energy-production.csv')
+
 def wpp_xls():
   """Returns file name of UN WPP spreadsheet."""
   return os.path.join(data_root(), 'wpp',
