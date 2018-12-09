@@ -312,8 +312,7 @@ def oneKm(year, scenario, hpd_trend):
     rasters[lu_type.name] = lu_type
     for band, intensity in enumerate(lui.intensities()):
       n = lu_type.name + '_' + intensity
-      if (n in ('urban_light', 'secondary_intense') or
-          lu_type == 'plantation_pri'):
+      if (lu_type == 'plantation_pri'):
         rasters[n] = SimpleExpr(n, '0')
       else:
         rasters[n] = lui.OneKm(lu_type.name, intensity)
