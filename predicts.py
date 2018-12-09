@@ -276,46 +276,33 @@ def oneKm(year, scenario, hpd_trend):
   rasters['plantation_pri'] = SimpleExpr('plantation_pri', '0')
   rasters['plantation_sec'] = SimpleExpr('plantation_sec', '0')
 
-  ## Human population density and UN subregions
-  rasters['hpd_ref'] = Raster('hpd_ref',
-                              os.path.join(utils.data_root(),
-                                           'grump1.0/gluds00ag'))
+  # UN country code and subregions
   rasters['unSub'] = Raster('unSub', outfn('1km', 'un_subregions.tif'))
   rasters['un_code'] = Raster('un_codes', outfn('1km', 'un_codes.tif'))
-  rasters['hpd'] = hpd.WPP(hpd_trend, year,
-                           os.path.join(utils.data_root(),
-                                        'wpp',
-                                        'WPP2010_DB2_F01_TOTAL_POPULATION_BOTH_SEXES.xls'))
 
-  ## NOTE: Pass max & min of log(HPD) so hi-res rasters can be processed
-  ## incrementally.  Recording the max value here for when I create
-  ## other functions for other resolutions.
-  ## 0.50 =>  20511.541 / 9.92874298232494
-  ## 0.25 =>  41335.645 / 10.62948048177454
-  ## 1km  => 872073.500 / 13.678628988329825
-  rasters['logHPD_rs'] = SimpleExpr('logHPD_rs',
-                                    'scale(log(hpd + 1), 0.0, 1.0, 0.0, 14.0)')
-  rasters['LogHPDPlus1_cs'] = SimpleExpr('logHPDPlus1_cs',
-                                         '(log(hpd + 1) - 3.396125) / 1.863318')
-  rasters['studyMeanHPD_cs'] = SimpleExpr('studyMeanHPD_cs', '3.3396125')
-  rasters['logDistRd_rs'] = Raster('logDistRd_rs',
-                                   outfn('1km', 'roads-final.tif'))
-  rasters['RdDens_50km'] = Raster('RdDens_50km', 
-                                    os.path.join(utils.data_root(), 
-                                                 'road-density', 'fake.tif'))
-                                                 #'road-density', 'roadDensity50km.tif'))
-  rasters['CRootRdDensPlus1_50km_cs'] = SimpleExpr('CRootRdDensPlus1_50km_cs',
-          '(log(RdDens_50km + 1) - 0.388077) / 0.1593538')
+  ## Human population density
+  if scenario == 'version3.3':
+    fname = 'zip://' + os.path.join(ddir, 'HPD.zip') + '!' + \
+      'HPD/yr%4d/hdr.adf' % year
+    rasters['hpd'] = Raster('hpd', fname)
+  else:
+    rasters['hpd_ref'] = Raster('hpd_ref',
+                                os.path.join(utils.data_root(),
+                                             'grump1.0/gluds00ag'))
+    rasters['hpd'] = hpd.WPP(hpd_trend, year,
+                             os.path.join(utils.data_root(),
+                                          'wpp',
+                                          'WPP2010_DB2_F01_TOTAL_POPULATION_BOTH_SEXES.xls'))
 
   ## Land use intensity rasters
   for lu_type in lus:
     rasters[lu_type.name] = lu_type
-    for band, intensity in enumerate(lui.intensities()):
-      n = lu_type.name + '_' + intensity
-      if (lu_type == 'plantation_pri'):
-        rasters[n] = SimpleExpr(n, '0')
+    for _, intensity in enumerate(lui.intensities()):
+      name = lu_type.name + '_' + intensity
+      if lu_type == 'plantation_pri':
+        rasters[name] = SimpleExpr(name, '0')
       else:
-        rasters[n] = lui.OneKm(lu_type.name, intensity)
+        rasters[name] = lui.OneKm(lu_type.name, intensity)
 
   name = '%s_light_and_intense' % 'primary'
   rasters[name] = SimpleExpr(name, 'primary_light + primary_intense')
