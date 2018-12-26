@@ -39,7 +39,7 @@ path (similar to calling os.path.join()).
 
   """
   return os.path.join(outdir(), res, *args)
-  
+
 @lrudecorator(10)
 def outdir():
   """Returns the root of the output folder."""
@@ -73,6 +73,12 @@ relative to this folder.
   else:
     raise RuntimeError('please set DATA_ROOT')
   return os.path.abspath(dr)
+
+def data_file(*args):
+  """Return the name of an data file as a string.  It creates a path by joining all the argument with DATA_ROOT prepended.
+
+  """
+  return os.path.join(data_root(), *args)
 
 def gdp_csv():
   return os.path.join(data_root(), 'econ',
