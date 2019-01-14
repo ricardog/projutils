@@ -80,6 +80,9 @@ def data_file(*args):
   """
   return os.path.join(data_root(), *args)
 
+def cnames_csv():
+  return data_file('ssp-data', 'country-names.csv')
+
 def gdp_csv():
   return os.path.join(data_root(), 'econ',
                       'gdp-per-capita.csv')
