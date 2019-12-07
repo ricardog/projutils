@@ -13,7 +13,7 @@ MEMCACHE = memory.Memory(cachedir=tempfile.mkdtemp(prefix='hpd-wpp'),
 
 class WPP(object):
   def __init__(self, trend, year, fname):
-    self._trend = 'historical' if year < 2011 else trend
+    self._trend = 'historical' if year < 2015 else trend
     self._year = year
     self._fname = fname
     self._sheet = get_sheets(self._trend, fname)[0]
@@ -75,21 +75,21 @@ def get_sheets(trend, wpp):
   return sheets
 
 def get_years(sheet):
-  return sheet.iloc[14, 5:].astype(int).tolist()
+  return sheet.iloc[15, 5:].astype(int).tolist()
 
 def project(trend, sheet, countries, grumps, mask, year, nodata):
   ## Some of the cells representing the year are treated as strings and
   ## some as integers so check for both.
-  col = np.logical_or(sheet.iloc[14].isin([year]),
-                      sheet.iloc[14].isin([str(year)]))
+  col = np.logical_or(sheet.iloc[15].isin([year]),
+                      sheet.iloc[15].isin([str(year)]))
   if not np.any(col):
     raise ValueError
-  ccode = sheet.iloc[15:, 4].astype(int).tolist()
-  hist = sheet.ix[15:, col]
+  ccode = sheet.iloc[16:, 4].astype(int).tolist()
+  hist = sheet.ix[16:, col]
   if trend == 'historical':
-    ref = sheet.ix[15:, u'Unnamed: 57']
+    ref = sheet.ix[16:, u'Unnamed: 57']
   else:
-    ref = sheet.ix[15:, u'Unnamed: 5']
+    ref = sheet.ix[16:, u'Unnamed: 5']
   pop = hist.divide(ref, axis="index").astype('float32').values
 
   mydict = dict((v, pop[ii]) for ii, v in enumerate(ccode))
