@@ -39,7 +39,7 @@ def ri2pi(obj):
                                         ordered = 'ordered' in obj.rclass)
   elif klass == robjects.Formula:
     res = obj
-  elif klass == rinterface.RNULLType:
+  elif klass == rinterface.NULLType:
     res = None
   elif klass == robjects.vectors.Vector:
     res = obj
@@ -65,9 +65,9 @@ def ri2pi(obj):
           else:
             res[name] = mat
         elif 'factor' in klasses:
-          res[name] = pandas2ri.ri2py(item[1])
+          res[name] = pandas2ri.rpy2py(item[1])
         elif 'logical' in klasses:
-          res[name] = pandas2ri.ri2py(item[1])
+          res[name] = pandas2ri.rpy2py(item[1])
         elif 'Date' in klasses:
           #raise RuntimeError('untested Date conversion')
           origin = datetime.date(1970, 1, 1)
