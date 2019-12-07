@@ -32,3 +32,6 @@ class SimpleExpr():
         w = window[1][1] - window[1][0]
         res = ma.masked_array(np.full((h, w), res, dtype=np.float32))
     return res
+
+  def __repr__(self):
+    return str(self.tree)
