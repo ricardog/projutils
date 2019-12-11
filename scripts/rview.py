@@ -68,8 +68,8 @@ def main(fname, band, title, save, vmax, vmin, colorbar):
   src = rasterio.open(fname)
   data = read_array(src, band)
   if True or too_big(src):
-    rmin = data.min()
-    rmax = data.max()
+    rmin = np.nanmin(data)
+    rmax = np.nanmax(data)
   else:
     rmin, rmax = get_min_max(fname)
 
