@@ -71,7 +71,7 @@ def get_sheets(trend, wpp):
     ## becuase Memcache will not preserve metadata attributes.  Once
     ## this gets fixed in pandas, it would be cleaner to create an
     ## attribute (name) that stores the sheet name.
-    sheet.ix[0, 0] = name.lower()
+    sheet.iloc[0, 0] = name.lower()
   return sheets
 
 def get_years(sheet):
@@ -85,11 +85,11 @@ def project(trend, sheet, countries, grumps, mask, year, nodata):
   if not np.any(col):
     raise ValueError
   ccode = sheet.iloc[16:, 4].astype(int).tolist()
-  hist = sheet.ix[16:, col]
+  hist = sheet.loc[16:, col]
   if trend == 'historical':
-    ref = sheet.ix[16:, u'Unnamed: 57']
+    ref = sheet.loc[16:, u'Unnamed: 57']
   else:
-    ref = sheet.ix[16:, u'Unnamed: 5']
+    ref = sheet.loc[16:, u'Unnamed: 5']
   pop = hist.divide(ref, axis="index").astype('float32').values
 
   mydict = dict((v, pop[ii]) for ii, v in enumerate(ccode))
