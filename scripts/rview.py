@@ -2,13 +2,19 @@
 
 from copy import copy
 
+import affine
+import cartopy
+import cartopy.crs as ccrs
 import click
+import matplotlib
+import matplotlib.pyplot as plt
+#from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 import numpy.ma as ma
 import rasterio
-from rasterio.plot import show, plotting_extent
-import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+from rasterio.plot import plotting_extent
+from rasterio.warp import Resampling, calculate_default_transform, reproject
+import re
 
 import projections.tiff_utils as tu
 
@@ -20,22 +26,43 @@ def get_min_max(fname):
   print('[%6.3f : %6.3f]' % (min, max))
   return min, max
 
-def too_big(src):
-  if src.height * src.width > 64<<20:
+def too_big(h, w):
+  if h * w > 64<<20:
     return True
   return False
 
-def read_array(src, band):
-  if too_big(src):
-    width = 2880
-    height = int(width * src.height * 1.0 / src.width)
+def read_array(src, band=1, window=None):
+  if too_big(window.height, window.width):
+    scale = int(window.width / 2048)
+    transform = affine.Affine(src.transform.a * scale,
+                              src.transform.b, src.transform.c,
+                              src.transform.d, src.transform.e * scale,
+                              src.transform.f)
+    width = int(window.width // scale)
+    height = int(window.height // scale)
   else:
-    width = src.width
-    height = src.height
-  out = np.empty((height, width), dtype = src.dtypes[band - 1])
-  src.read(band, masked=True, out=out)
-  return ma.masked_equal(out, src.nodatavals[band - 1])
+    transform = src.transform
+    width = int(window.width)
+    height = int(window.height)
+  data = src.read(band, masked=True, window=window, out_shape=(height, width))
+  return transform, data
 
+def project(dst_crs, src, src_data, src_bounds, src_transform):
+  src_height, src_width = src_data.shape
+  dst_transform, dst_width, dst_height = \
+    calculate_default_transform(src.crs, dst_crs, src_width, src_height,
+                                *src_bounds)
+  dst_data = ma.zeros((dst_height, dst_width), src_data.dtype)
+  dst_data.fill_value = src.nodata
+  reproject(source=src_data.filled(), destination=dst_data,
+            src_transform=src_transform, src_crs=src.crs,
+            dst_transform=dst_transform, dst_crs=dst_crs,
+            src_nodata=src.nodata, dst_nodata=src.nodata,
+            resampling=Resampling.bilinear)
+  return (dst_width, dst_height, dst_transform,
+          ma.masked_equal(dst_data.astype(src_data.dtype),
+                          src_data.fill_value))
+            
 @click.command()
 @click.argument('fname', type=click.Path(dir_okay=False))
 @click.option('-b', '--band', type=int, default=1,
@@ -56,7 +83,9 @@ def read_array(src, band):
               'this value.')
 @click.option('--colorbar/--no-colorbar', default=True,
               help='Display/hide a colorbar with the value range.')
-def main(fname, band, title, save, vmax, vmin, colorbar):
+@click.option('-p', '--projected',
+              type=click.Choice(set(filter(lambda x: re.match('[A-Z][a-z]+', x), dir(ccrs)))))
+def main(fname, band, title, save, vmax, vmin, colorbar, projected):
   if title is None:
     title = fname
   palette = copy(plt.cm.viridis)
@@ -64,10 +93,14 @@ def main(fname, band, title, save, vmax, vmin, colorbar):
   palette.set_under('k', 1.0)
   #palette.set_bad('#0e0e2c', 1.0)
   palette.set_bad('w', 1.0)
-
+  #extent = (-180, -90, 180, 90)
+  
   src = rasterio.open(fname)
-  data = read_array(src, band)
-  if True or too_big(src):
+  extent = src.bounds
+  window = src.window(*extent)
+  new_transform, data = read_array(src, band, window)
+
+  if True or too_big(window.height, window.width):
     rmin = np.nanmin(data)
     rmax = np.nanmax(data)
   else:
@@ -79,34 +112,41 @@ def main(fname, band, title, save, vmax, vmin, colorbar):
     vmin = rmin
 
   dpi = 100.0
-  size = [data.shape[2] / dpi, data.shape[1] / dpi]
+  size = [data.shape[1] / dpi, data.shape[0] / dpi]
   if colorbar:
     size[1] += 70 / dpi
     pass
 
-  if save:
-    fig = plt.figure(figsize=size, dpi=dpi)
-    ax = plt.gca()
-    show(data, ax=ax, cmap=palette, title=title, vmin=vmin, vmax=vmax,
-         extent=plotting_extent(src))
-    fig.tight_layout()
-    #ax.axis('off')
-    if colorbar:
-      divider = make_axes_locatable(ax)
-      cax = divider.append_axes("bottom", size="5%", pad=0.25)
-      plt.colorbar(ax.images[0], cax=cax, orientation='horizontal')
-    fig.savefig(save, transparent=False)
-    plt.show()
+  globe = ccrs.Globe(datum='WGS84', ellipse='WGS84')
+  if projected:
+    crs = getattr(ccrs, projected)(globe=globe)
   else:
-    fig = plt.figure(figsize=size, dpi=dpi)
-    ax = plt.gca()
-    show(data, ax=ax, cmap=palette, title=title, vmin=vmin, vmax=vmax,
-         extent=plotting_extent(src))
-    if colorbar:
-      divider = make_axes_locatable(ax)
-      cax = divider.append_axes("bottom", size="5%", pad=0.25)
-      plt.colorbar(ax.images[0], cax=cax, orientation='horizontal')
-    plt.show()
+    crs = ccrs.PlateCarree(globe=globe)
+  (dst_width, dst_height,
+   dst_transform, dst_data) = project(crs.proj4_params, src, data, extent,
+                                      new_transform)
+  extent = plotting_extent(dst_data, dst_transform)
+  #xmin, ymax = dst_transform * (0, 0)
+  #xmax, ymin = dst_transform * (dst_width, dst_height)
+  
+  cm_orientation = "vertical" if projected else "horizontal"
+  fig = plt.figure(figsize=size, dpi=dpi)
+  ax = plt.axes(projection=crs)
+  ax.set_global()
+  ax.imshow(dst_data, origin='upper', extent=extent,
+            cmap=palette, vmin=vmin, vmax=vmax)
+  ax.coastlines()
+  ax.add_feature(cartopy.feature.BORDERS)
+  if colorbar:
+    sm = matplotlib.cm.ScalarMappable(cmap=palette,
+                                      norm=plt.Normalize(vmin, vmax))
+    sm._A = []
+    cb = plt.colorbar(sm, orientation=cm_orientation)
+    cb.set_label(title)
+  if save:
+    fig.savefig(save, transparent=False)
+  plt.show()
+
 
 if __name__ == '__main__':
   main()
