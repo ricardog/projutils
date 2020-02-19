@@ -15,20 +15,12 @@ from rasterio.plot import plotting_extent
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 import re
 
-import projections.tiff_utils as tu
-
-def get_min_max(fname):
-  import gdal
-  ds = gdal.Open(fname)
-  min, max = tu.get_min_max(ds)
-  del ds
-  print('[%6.3f : %6.3f]' % (min, max))
-  return min, max
 
 def too_big(h, w):
   if h * w > 64<<20:
     return True
   return False
+
 
 def read_array(src, band=1, window=None, max_width=2048):
   if window is None:
@@ -93,11 +85,8 @@ def main(fname, band, title, save, vmax, vmin, colorbar, projected):
   src = rasterio.open(fname)
   new_transform, data = read_array(src, band)
 
-  if True or too_big(src.height, src.width):
-    rmin = np.nanmin(data)
-    rmax = np.nanmax(data)
-  else:
-    rmin, rmax = get_min_max(fname)
+  rmin = np.nanmin(data)
+  rmax = np.nanmax(data)
 
   if vmax is None:
     vmax = rmax
