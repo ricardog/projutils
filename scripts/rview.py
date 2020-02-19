@@ -108,7 +108,6 @@ def main(fname, band, title, save, vmax, vmin, colorbar, projected):
   size = [data.shape[1] / dpi, data.shape[0] / dpi]
   if colorbar:
     size[1] += 70 / dpi
-    cm_orientation = "vertical" if projected else "horizontal"
 
   globe = ccrs.Globe(datum='WGS84', ellipse='WGS84')
   if projected:
@@ -131,7 +130,7 @@ def main(fname, band, title, save, vmax, vmin, colorbar, projected):
     sm = matplotlib.cm.ScalarMappable(cmap=palette,
                                       norm=plt.Normalize(vmin, vmax))
     sm._A = []
-    cb = plt.colorbar(sm, orientation=cm_orientation)
+    cb = plt.colorbar(sm, orientation='vertical')
     cb.set_label(title)
   if save:
     fig.savefig(save, transparent=False)
