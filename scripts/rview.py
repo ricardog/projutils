@@ -8,7 +8,6 @@ import cartopy.crs as ccrs
 import click
 import matplotlib
 import matplotlib.pyplot as plt
-#from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 import numpy.ma as ma
 import rasterio
@@ -31,23 +30,20 @@ def too_big(h, w):
     return True
   return False
 
-def read_array(src, band=1, window=None):
+def read_array(src, band=1, window=None, max_width=2048):
+  if window is None:
+    window = src.window(*src.bounds)
   if too_big(window.height, window.width):
-    scale = int(window.width / 2048)
-    transform = affine.Affine(src.transform.a * scale,
-                              src.transform.b, src.transform.c,
-                              src.transform.d, src.transform.e * scale,
-                              src.transform.f)
-    width = int(window.width // scale)
-    height = int(window.height // scale)
+    scale = int(window.width / max_width)
   else:
-    transform = src.transform
-    width = int(window.width)
-    height = int(window.height)
+    scale = 1.0
+  transform = src.transform * affine.Affine.scale(scale)
+  width = int(window.width // scale)
+  height = int(window.height // scale)
   data = src.read(band, masked=True, window=window, out_shape=(height, width))
   return transform, data
 
-def project(dst_crs, src, src_data, src_bounds, src_transform):
+def project(dst_crs, src, src_data, src_transform, *src_bounds):
   src_height, src_width = src_data.shape
   dst_transform, dst_width, dst_height = \
     calculate_default_transform(src.crs, dst_crs, src_width, src_height,
@@ -59,7 +55,7 @@ def project(dst_crs, src, src_data, src_bounds, src_transform):
             dst_transform=dst_transform, dst_crs=dst_crs,
             src_nodata=src.nodata, dst_nodata=src.nodata,
             resampling=Resampling.bilinear)
-  return (dst_width, dst_height, dst_transform,
+  return (dst_transform,
           ma.masked_equal(dst_data.astype(src_data.dtype),
                           src_data.fill_value))
             
@@ -93,14 +89,11 @@ def main(fname, band, title, save, vmax, vmin, colorbar, projected):
   palette.set_under('k', 1.0)
   #palette.set_bad('#0e0e2c', 1.0)
   palette.set_bad('w', 1.0)
-  #extent = (-180, -90, 180, 90)
   
   src = rasterio.open(fname)
-  extent = src.bounds
-  window = src.window(*extent)
-  new_transform, data = read_array(src, band, window)
+  new_transform, data = read_array(src, band)
 
-  if True or too_big(window.height, window.width):
+  if True or too_big(src.height, src.width):
     rmin = np.nanmin(data)
     rmax = np.nanmax(data)
   else:
@@ -115,25 +108,22 @@ def main(fname, band, title, save, vmax, vmin, colorbar, projected):
   size = [data.shape[1] / dpi, data.shape[0] / dpi]
   if colorbar:
     size[1] += 70 / dpi
-    pass
+    cm_orientation = "vertical" if projected else "horizontal"
 
   globe = ccrs.Globe(datum='WGS84', ellipse='WGS84')
   if projected:
     crs = getattr(ccrs, projected)(globe=globe)
   else:
     crs = ccrs.PlateCarree(globe=globe)
-  (dst_width, dst_height,
-   dst_transform, dst_data) = project(crs.proj4_params, src, data, extent,
-                                      new_transform)
-  extent = plotting_extent(dst_data, dst_transform)
-  #xmin, ymax = dst_transform * (0, 0)
-  #xmax, ymin = dst_transform * (dst_width, dst_height)
-  
-  cm_orientation = "vertical" if projected else "horizontal"
+
+  (dst_transform, dst_data) = project(crs.proj4_params, src, data,
+                                      new_transform, *src.bounds)
+
   fig = plt.figure(figsize=size, dpi=dpi)
   ax = plt.axes(projection=crs)
   ax.set_global()
-  ax.imshow(dst_data, origin='upper', extent=extent,
+  ax.imshow(dst_data, origin='upper',
+            extent=plotting_extent(dst_data, dst_transform),
             cmap=palette, vmin=vmin, vmax=vmax)
   ax.coastlines()
   ax.add_feature(cartopy.feature.BORDERS)
