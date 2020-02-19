@@ -2,15 +2,28 @@
 
 from copy import copy
 
+import affine
 import cartopy
 import cartopy.crs as ccrs
 import click
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.ma as ma
 import rasterio
+from rasterio.plot import plotting_extent
+from rasterio.warp import Resampling, calculate_default_transform, reproject
 import re
 
+import projections.tiff_utils as tu
+
+def get_min_max(fname):
+  import gdal
+  ds = gdal.Open(fname)
+  min, max = tu.get_min_max(ds)
+  del ds
+  print('[%6.3f : %6.3f]' % (min, max))
+  return min, max
 
 def too_big(h, w):
   if h * w > 64<<20:
@@ -24,10 +37,27 @@ def read_array(src, band=1, window=None, max_width=2048):
     scale = int(window.width / max_width)
   else:
     scale = 1.0
+  transform = src.transform * affine.Affine.scale(scale)
   width = int(window.width // scale)
   height = int(window.height // scale)
-  return src.read(band, masked=True, window=window, out_shape=(height, width))
+  data = src.read(band, masked=True, window=window, out_shape=(height, width))
+  return transform, data
 
+def project(dst_crs, src, src_data, src_transform, *src_bounds):
+  src_height, src_width = src_data.shape
+  dst_transform, dst_width, dst_height = \
+    calculate_default_transform(src.crs, dst_crs, src_width, src_height,
+                                *src_bounds)
+  dst_data = ma.zeros((dst_height, dst_width), src_data.dtype)
+  dst_data.fill_value = src.nodata
+  reproject(source=src_data.filled(), destination=dst_data,
+            src_transform=src_transform, src_crs=src.crs,
+            dst_transform=dst_transform, dst_crs=dst_crs,
+            src_nodata=src.nodata, dst_nodata=src.nodata,
+            resampling=Resampling.bilinear)
+  return (dst_transform,
+          ma.masked_equal(dst_data.astype(src_data.dtype),
+                          src_data.fill_value))
             
 @click.command()
 @click.argument('fname', type=click.Path(dir_okay=False))
@@ -50,7 +80,6 @@ def read_array(src, band=1, window=None, max_width=2048):
 @click.option('--colorbar/--no-colorbar', default=True,
               help='Display/hide a colorbar with the value range.')
 @click.option('-p', '--projected',
-              help='Use cartopy to reproject the data.',
               type=click.Choice(set(filter(lambda x: re.match('[A-Z][a-z]+', x), dir(ccrs)))))
 def main(fname, band, title, save, vmax, vmin, colorbar, projected):
   if title is None:
@@ -62,10 +91,13 @@ def main(fname, band, title, save, vmax, vmin, colorbar, projected):
   palette.set_bad('w', 1.0)
   
   src = rasterio.open(fname)
-  data = read_array(src, band)
+  new_transform, data = read_array(src, band)
 
-  rmin = np.nanmin(data)
-  rmax = np.nanmax(data)
+  if True or too_big(src.height, src.width):
+    rmin = np.nanmin(data)
+    rmax = np.nanmax(data)
+  else:
+    rmin, rmax = get_min_max(fname)
 
   if vmax is None:
     vmax = rmax
@@ -76,18 +108,22 @@ def main(fname, band, title, save, vmax, vmin, colorbar, projected):
   size = [data.shape[1] / dpi, data.shape[0] / dpi]
   if colorbar:
     size[1] += 70 / dpi
+    cm_orientation = "vertical" if projected else "horizontal"
 
+  globe = ccrs.Globe(datum='WGS84', ellipse='WGS84')
   if projected:
-    crs = getattr(ccrs, projected)()
+    crs = getattr(ccrs, projected)(globe=globe)
   else:
-    crs = ccrs.PlateCarree()
+    crs = ccrs.PlateCarree(globe=globe)
+
+  (dst_transform, dst_data) = project(crs.proj4_params, src, data,
+                                      new_transform, *src.bounds)
 
   fig = plt.figure(figsize=size, dpi=dpi)
   ax = plt.axes(projection=crs)
   ax.set_global()
-  ax.imshow(data, origin='upper', transform=ccrs.PlateCarree(),
-            extent=[src.bounds.left, src.bounds.right,
-                    src.bounds.bottom, src.bounds.top],
+  ax.imshow(dst_data, origin='upper',
+            extent=plotting_extent(dst_data, dst_transform),
             cmap=palette, vmin=vmin, vmax=vmax)
   ax.coastlines()
   ax.add_feature(cartopy.feature.BORDERS)
@@ -95,7 +131,7 @@ def main(fname, band, title, save, vmax, vmin, colorbar, projected):
     sm = matplotlib.cm.ScalarMappable(cmap=palette,
                                       norm=plt.Normalize(vmin, vmax))
     sm._A = []
-    cb = plt.colorbar(sm, orientation='vertical')
+    cb = plt.colorbar(sm, orientation=cm_orientation)
     cb.set_label(title)
   if save:
     fig.savefig(save, transparent=False)
