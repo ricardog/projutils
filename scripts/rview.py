@@ -63,11 +63,16 @@ def plotting_extent(crs, src_bounds):
               'this value.')
 @click.option('--colorbar/--no-colorbar', default=True,
               help='Display/hide a colorbar with the value range.')
+@click.option('--coastline/--no-coastline', default=False,
+              help='Display/hide a line showing coastlines.')
+@click.option('--borders/--no-borders', default=False,
+              help='Display/hide country borders.')
 @click.option('-p', '--projected',
               type=click.Choice(set(filter(lambda x:
                                            re.match('[A-Z][a-z]+', x),
                                            dir(ccrs))).union({'OSGB', 'OSNI'})))
-def main(fname, band, title, save, vmax, vmin, colorbar, projected):
+def main(fname, band, title, save, vmax, vmin, colorbar, coastline,
+         borders, projected):
   if title is None:
     title = fname
   palette = copy(plt.cm.viridis)
@@ -76,17 +81,17 @@ def main(fname, band, title, save, vmax, vmin, colorbar, projected):
   #palette.set_bad('#0e0e2c', 1.0)
   palette.set_bad('w', 1.0)
 
-  globe = ccrs.Globe(datum='WGS84', ellipse='WGS84')
   pc_crs = ccrs.PlateCarree()
   if projected in('OSGB', 'OSNI'):
     crs = getattr(ccrs, projected)()
   elif projected:
-    crs = getattr(ccrs, projected)(globe=globe)
+    crs = getattr(ccrs, projected)()
   else:
-    crs = ccrs.PlateCarree(globe=globe)
+    crs = ccrs.PlateCarree()
 
   src = rasterio.open(fname)
   extent = plotting_extent(crs, src.bounds)
+  print(extent)
   data = read_array(src, band, window=src.window(*extent))
 
   if vmax is None:
@@ -105,8 +110,10 @@ def main(fname, band, title, save, vmax, vmin, colorbar, projected):
   ax.imshow(data, origin='upper', transform=pc_crs,
             extent=(extent[0], extent[2], extent[1], extent[3]),
             cmap=palette, vmin=vmin, vmax=vmax)
-  ax.coastlines(resolution='10m')
-  ax.add_feature(cartopy.feature.BORDERS)
+  if coastline:
+    ax.coastlines(resolution='10m')
+  if borders:
+    ax.add_feature(cartopy.feature.BORDERS)
   if colorbar:
     sm = matplotlib.cm.ScalarMappable(cmap=palette,
                                       norm=plt.Normalize(vmin, vmax))
