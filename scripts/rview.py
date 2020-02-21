@@ -33,12 +33,14 @@ def read_array(src, band=1, window=None, max_width=2048):
             
 def plotting_extent(crs, src_bounds):
   pc_crs = ccrs.PlateCarree()
-  lons_lats = pc_crs.transform_points(crs, np.array(crs.x_limits),
-                                      np.array(crs.y_limits))
-  return (max(lons_lats[0, 0], src_bounds.left),
-          max(lons_lats[0, 1], src_bounds.bottom),
-          min(lons_lats[1, 0], src_bounds.right),
-          min(lons_lats[1, 1], src_bounds.top))
+  x, y = crs.boundary.coords.xy
+  points = pc_crs.transform_points(crs, np.array(x), np.array(y))
+  mins = points.min(axis=0)
+  maxs = points.max(axis=0)
+  return (max(mins[0], src_bounds.left),
+          max(mins[1], src_bounds.bottom),
+          min(maxs[0], src_bounds.right),
+          min(maxs[1], src_bounds.top))
   
 
 @click.command()
