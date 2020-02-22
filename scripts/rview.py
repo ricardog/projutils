@@ -98,7 +98,6 @@ def main(fname, band, title, save, vmax, vmin, colorbar, coastline,
 
   src = rasterio.open(fname)
   extent = plotting_extent(crs, src.bounds)
-  print(extent)
   data = read_array(src, band, window=src.window(*extent))
 
   if vmax is None:
@@ -117,10 +116,14 @@ def main(fname, band, title, save, vmax, vmin, colorbar, coastline,
   ax.imshow(data, origin='upper', transform=pc_crs,
             extent=(extent[0], extent[2], extent[1], extent[3]),
             cmap=palette, vmin=vmin, vmax=vmax)
+  auto_scaler = cartopy.feature.AdaptiveScaler('110m', (('50m', 50),
+                                                        ('10m', 15)))
+  scale = auto_scaler.scale_from_extent([extent[0], extent[2],
+                                         extent[1], extent[3]])
   if coastline:
-    ax.coastlines(resolution='10m')
+    ax.coastlines(resolution=scale)
   if borders:
-    ax.add_feature(cartopy.feature.BORDERS)
+    ax.add_feature(cartopy.feature.BORDERS.with_scale(scale))
   if colorbar:
     sm = matplotlib.cm.ScalarMappable(cmap=palette,
                                       norm=plt.Normalize(vmin, vmax))
