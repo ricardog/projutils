@@ -71,8 +71,9 @@ def plotting_extent(crs, src_bounds):
               type=click.Choice(set(filter(lambda x:
                                            re.match('[A-Z][a-z]+', x),
                                            dir(ccrs))).union({'OSGB', 'OSNI'})))
+@click.option('-e', '--epsg', type=int)
 def main(fname, band, title, save, vmax, vmin, colorbar, coastline,
-         borders, projected):
+         borders, projected, epsg):
   if title is None:
     title = fname
   palette = copy(plt.cm.viridis)
@@ -86,6 +87,12 @@ def main(fname, band, title, save, vmax, vmin, colorbar, coastline,
     crs = getattr(ccrs, projected)()
   elif projected:
     crs = getattr(ccrs, projected)()
+  elif epsg:
+    try:
+      crs = ccrs.epsg(epsg)
+    except ValueError:
+      print('EPSG code %d does not define a projection')
+      return
   else:
     crs = ccrs.PlateCarree()
 
