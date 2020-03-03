@@ -2,7 +2,6 @@
 
 from copy import copy
 
-import affine
 import cartopy
 import cartopy.crs as ccrs
 import click
@@ -31,12 +30,21 @@ def read_array(src, band=1, window=None, max_width=2048):
   return src.read(band, masked=True, window=window, out_shape=(height, width))
 
             
-def plotting_extent(crs, src_bounds):
-  pc_crs = ccrs.PlateCarree()
+def plotting_extent(crs, src_bounds, src_crs):
+  #pc_crs = ccrs.PlateCarree()
   x, y = crs.boundary.coords.xy
-  points = pc_crs.transform_points(crs, np.array(x), np.array(y))
+  points = src_crs.transform_points(crs, np.array(x), np.array(y))
+  points = points[np.all(np.isfinite(points), axis=1)]
   mins = points.min(axis=0)
   maxs = points.max(axis=0)
+  if not np.all(np.isfinite(points)):
+    x1, y1 = src_crs.boundary.coords.xy
+    points1 = crs.transform_points(src_crs, np.array(x1), np.array(y1))
+    x = points1[:, 0]
+    y = points1[:, 1]
+    points = src_crs.transform_points(crs, np.array(x), np.array(y))
+    mins = points.min(axis=0)
+    maxs = points.max(axis=0)
   return (max(mins[0], src_bounds.left),
           max(mins[1], src_bounds.bottom),
           min(maxs[0], src_bounds.right),
@@ -82,7 +90,6 @@ def main(fname, band, title, save, vmax, vmin, colorbar, coastline,
   #palette.set_bad('#0e0e2c', 1.0)
   palette.set_bad('w', 1.0)
 
-  pc_crs = ccrs.PlateCarree()
   if projected in('OSGB', 'OSNI'):
     crs = getattr(ccrs, projected)()
   elif projected:
@@ -97,7 +104,11 @@ def main(fname, band, title, save, vmax, vmin, colorbar, coastline,
     crs = ccrs.PlateCarree()
 
   src = rasterio.open(fname)
-  extent = plotting_extent(crs, src.bounds)
+  if src.crs is None or src.crs == {} or src.crs.to_epsg() == 4326:
+    src_crs = ccrs.PlateCarree()
+  else:
+    src_crs = ccrs.epsg(src.crs.to_epsg())
+  extent = plotting_extent(crs, src.bounds, src_crs)
   data = read_array(src, band, window=src.window(*extent))
 
   if vmax is None:
@@ -113,7 +124,7 @@ def main(fname, band, title, save, vmax, vmin, colorbar, coastline,
   fig = plt.figure(figsize=size, dpi=dpi)
   ax = plt.axes(projection=crs)
   ax.set_global()
-  ax.imshow(data, origin='upper', transform=pc_crs,
+  ax.imshow(data, origin='upper', transform=src_crs,
             extent=(extent[0], extent[2], extent[1], extent[3]),
             cmap=palette, vmin=vmin, vmax=vmax)
   auto_scaler = cartopy.feature.AdaptiveScaler('110m', (('50m', 50),
