@@ -189,7 +189,7 @@ def rasterize(gdb_dir, resolution, raster_fn):
                                                    2, # self + prox
                                                    gdal.GDT_Float32,
                                                    ['COMPRESS=lzw',
-                                                    'PREDICTOR=2'])
+                                                    'PREDICTOR=3'])
   target_ds.SetGeoTransform((x_min, x_res, 0, y_max, 0, -y_res))
   target_ds.GetRasterBand(2).SetNoDataValue(nodata)
   if source_srs:

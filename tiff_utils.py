@@ -70,7 +70,7 @@ def from_array(data, path, xsize, ysize, nodata=-9999, trans='', proj=''):
   geotiff = gdal.GetDriverByName("GTiff")
   dst_ds = geotiff.Create(path, xsize, ysize, 1,
                           gdal.GetDataTypeByName('Float32'),
-                          ['COMPRESS=lzw', 'PREDICTOR=2'])
+                          ['COMPRESS=lzw', 'PREDICTOR=3'])
   if dst_ds is None:
     raise RuntimeError("failed to create output raster '%s'" % oname)
   dst_ds.SetProjection(proj)
@@ -87,7 +87,7 @@ def from_pd(df, path, nodata=-9999, trans='', proj=''):
     geotiff = gdal.GetDriverByName("GTiff")
     dst_ds = geotiff.Create(path, df.xsize, df.ysize, len(df.columns),
                             gdal.GetDataTypeByName('Float32'),
-                            ['COMPRESS=lzw', 'PREDICTOR=2'])
+                            ['COMPRESS=lzw', 'PREDICTOR=3'])
     if dst_ds is None:
       raise RuntimeError("failed to create output raster '%s'" % oname)
     dst_ds.SetProjection(proj)
@@ -231,7 +231,7 @@ def regularize(src_fn, dst_fn, src_band=1, offset=1.0, low=0.0, high=1):
     dst_ds = geotiff.Create(dst_fn, src_ds.RasterXSize, src_ds.RasterYSize,
                             2, # Store the unscaled (but log-ed) value in band 2
                             gdal.GetDataTypeByName('Float32'),
-                            ['COMPRESS=lzw', 'PREDICTOR=2'])
+                            ['COMPRESS=lzw', 'PREDICTOR=3'])
     if dst_ds is None:
       raise RuntimeError("Error: could not open raster file '%s'" % dst_fn)
     dst_ds.SetProjection(src_ds.GetProjection())

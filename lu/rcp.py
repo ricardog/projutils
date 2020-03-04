@@ -136,7 +136,7 @@ def extract(fileobj, outdir, years):
         temp.flush()
         out_name = os.path.join(tmpdir, base + '.tif')
         subprocess.check_output(['gdal_translate', '-of', 'GTiff',
-                                 '-co', 'COMPRESS=lzw', '-co', 'PREDICTOR=2',
+                                 '-co', 'COMPRESS=lzw', '-co', 'PREDICTOR=3',
                                  '-ot', 'Float32', temp.name, out_name])
   return out_files
 
