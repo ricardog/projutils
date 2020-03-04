@@ -79,12 +79,19 @@ def plotting_extent(crs, src_bounds, src_crs):
               type=click.Choice(set(filter(lambda x:
                                            re.match('[A-Z][a-z]+', x),
                                            dir(ccrs))).union({'OSGB', 'OSNI'})))
+@click.option('-c', '--colormap',
+              type=click.Choice(sorted(set(filter(lambda x:
+                                                  re.match('[A-Z][a-z]+', x),
+                                                  dir(plt.cm))))))
 @click.option('-e', '--epsg', type=int)
 def main(fname, band, title, save, vmax, vmin, colorbar, coastline,
-         borders, projected, epsg):
+         borders, projected, epsg, colormap):
   if title is None:
     title = fname
-  palette = copy(plt.cm.viridis)
+  if colormap:
+    palette = copy(getattr(plt.cm, colormap))
+  else:
+    palette = copy(plt.cm.viridis)
   palette.set_over('r', 1.0)
   palette.set_under('k', 1.0)
   #palette.set_bad('#0e0e2c', 1.0)
