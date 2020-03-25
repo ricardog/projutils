@@ -1,8 +1,8 @@
 
 import re
 
-LU = {'primary': 'primf',
-      'secondary': 'secd',
+LU = {'primary': 'primf + primn',
+      'secondary': 'secdf + secdn',
       'cropland': 'c3ann + c4ann + c3nfx',
       'pasture': 'pastr + range',
       'urban': 'urban',
@@ -10,7 +10,7 @@ LU = {'primary': 'primf',
       'plantation_sec': '0',
 }
 
-LUp3 = {'primary': 'primf',
+LUp3 = {'primary': 'primf + primn',
         'young_secondary': 'secdy',
         'intermediate_secondary': 'secdi',
         'mature_secondary': 'secdm',

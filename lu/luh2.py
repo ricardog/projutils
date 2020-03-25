@@ -6,7 +6,7 @@ from ..r2py import rparser
 
 LU = {'annual': 'c3ann + c4ann',
       'nitrogen': 'c3nfx',
-      'cropland': 'c3ann + c4ann + c3nfx',
+      'cropland': 'c3ann + c4ann',
       'pasture': 'pastr',
       'perennial': 'c3per + c4per',
       'primary': 'primf + primn',
