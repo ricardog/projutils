@@ -41,6 +41,8 @@ def to_rexpr(root):
     return 'log(%s)' % to_rexpr(root.args[0])
   if root.type is Operator('exp'):
     return 'exp(%s)' % to_rexpr(root.args[0])
+  if root.type is Operator('sqrt'):
+    return 'sqrt(%s)' % to_rexpr(root.args[0])
   if root.type is Operator('scale'):
     return 'rescale(%s, newrange = c(%d, %d))' % (to_rexpr(root.args[0]),
                                                   root.args[1], root.args[2])
@@ -87,6 +89,8 @@ def to_repr(root):
     return '(log(%s))' % to_repr(root.args[0])
   if root.type is Operator('exp'):
     return '(exp(%s))' % to_repr(root.args[0])
+  if root.type is Operator('sqrt'):
+    return '(sqrt(%s))' % to_rexpr(root.args[0])
   if root.type is Operator('scale'):
     if len(root.args) == 3:
       return '(scale(%s, %d, %d))' % (to_repr(root.args[0]),
@@ -183,6 +187,8 @@ def to_expr(root, ctx=None):
     return '(ma.log(%s))' % recurse(root.args[0])
   if root.type is Operator('exp'):
     return '(ma.exp(%s))' % recurse(root.args[0])
+  if root.type is Operator('sqrt'):
+    return '(ma.sqrt(%s))' % recurse(root.args[0])
   if root.type is Operator('scale'):
     if len(root.args) == 3:
       return '(poly.scale(%s, %d, %d))' % (recurse(root.args[0]),

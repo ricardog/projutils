@@ -96,6 +96,10 @@ def parse(text):
       assert len(l) == 2, "unexpected number of arguments to exp"
       args = walk(l[1])
       return Node(Operator('exp'), [args])
+    if l[0] == 'sqrt':
+      assert len(l) == 2, "unexpected number of arguments to sqrt"
+      args = walk(l[1])
+      return Node(Operator('sqrt'), [args])
     if l[0] == 'clip':
       assert len(l) == 2, "unexpected number of arguments to %s" % l[0]
       assert len(l[1]) == 3, "unexpected number of arguments to %s" % l[0]
