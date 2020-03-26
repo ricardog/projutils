@@ -6,9 +6,13 @@ import projections.r2py.reval as reval
 import projections.r2py.rparser as rparser
 
 class SimpleExpr():
-  def __init__(self, name, expr):
-    self.name = name
-    self.tree = reval.make_inputs(rparser.parse(expr))
+  def __init__(self, name, expr=None):
+    if expr is not None:
+      self.name = name
+      self.tree = reval.make_inputs(rparser.parse(expr))
+    else:
+      self.name = 'dummy'
+      self.tree = reval.make_inputs(rparser.parse(name))
     lokals = {}
     exec(reval.to_py(self.tree, name), lokals)
     self.func = lokals[name + '_st']
