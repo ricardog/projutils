@@ -1,5 +1,6 @@
 
 from functools import reduce
+import inflection
 import netCDF4
 import os
 import re
@@ -325,18 +326,13 @@ def rasterset(lu_src, scenario, year, hpd_trend='medium'):
     return oneKm(year, scenario, hpd_trend)
 
 def predictify(mod):
-  # Remove dots from variable names.  Should also remove any characters
-  # which cannot appear in a python variable or function name.
-  pattern = re.compile(r'(?<!^)(?=[A-Z])')
-  dots = re.compile(r'\.| |-')
-
+  # Convert variable names to valid pythin identifiers.  Converts
+  # CamelCase to snake_case as a by-product.
   def nodots(root):
     if isinstance(root, str):
-      newr = pattern.sub('_', root).lower()
-      newr = dots.sub('_', newr)
-      return newr
+      return inflection.parameterize(inflection.underscore(root), '_')
     return root
-
+  
   syms = mod.hstab
   if not syms:
     return
