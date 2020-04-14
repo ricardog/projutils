@@ -2,11 +2,9 @@
 from copy import copy
 import importlib
 import numpy as np
-import re
 import os
 import sys
 
-from .. import lu
 from .. import utils
 
 LUI_MODEL_MAP = {'annual': 'cropland',
@@ -94,32 +92,3 @@ class LUH2(object):
       res = np.where(intense + res > 1, 1 - intense, res)
     res *= df[self._name]
     return res
-
-def _predictify(sym, prefix):
-  newr = sym.replace(prefix, '')
-  newr = newr.replace(' vegetation', '')
-  newr = newr.replace(' forest', '_pri')
-  newr = newr.replace('Managed ', '')
-  newr = newr.replace(' secondary', '_secondary')
-  newr = re.sub(r'(Minimal|Light|Intense) use',  "\\1", newr)
-  newr = newr.lower()
-  name = newr.split(' ')[0]
-  newr = newr.replace(' ', '_')
-  newr = newr.replace('pasture_light', 'pasture_minimal_and_light')
-  newr = newr.replace('rangelands_light', 'rangelands_light_and_intense')
-  assert name in lu.luh2.types(), 'unknown land use type %s' % sym
-  return newr
-
-def is_luh2(syms, prefix):
-  for sym in syms:
-    try:
-      newr = _predictify(sym, prefix)
-    except AssertionError as e:
-      return False
-  return True
-
-def predictify(root, prefix):
-  if isinstance(root, str) and re.match(prefix, root):
-    newr = _predictify(root, prefix)
-    return newr
-  return root

@@ -2,10 +2,8 @@
 import importlib
 import numpy as np
 import os
-import re
 import sys
 
-from .. import lu
 from .. import utils
 
 class RCP(object):
@@ -73,16 +71,3 @@ class RCP(object):
                        1 - df[self.as_intense], res)
     res *= df[self._name]
     return res
-
-def predictify(root, prefix):
-  if isinstance(root, str) and re.match(prefix, root):
-    newr = root.replace(prefix, '')
-    newr = newr.replace(' Vegetation', '')
-    newr = newr.replace(' forest', '_pri')
-    newr = re.sub(r'(Minimal|Light|Intense) use',  "\\1", newr)
-    newr = newr.lower()
-    name = newr.split(' ')[0]
-    newr = newr.replace(' ', '_')
-    assert name in lu.rcp.types(), 'unknown land use type %s' % root
-    return newr
-  return root

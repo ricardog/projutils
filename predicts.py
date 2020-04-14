@@ -3,14 +3,12 @@ from functools import reduce
 import inflection
 import netCDF4
 import os
-import re
 
 from .rasterset import Raster
 from .simpleexpr import SimpleExpr
 from . import hpd
 from . import lu
 from . import lui
-from . import ui
 from . import utils
 from .utils import outfn
 
@@ -338,43 +336,3 @@ def predictify(mod):
     return
   mod.equation.transform(nodots)
   return
-  
-  if 'UseIntensity' in syms:
-    print('predictify UseIntensity as base')
-    f = lambda x: ui.predictify(x, 'UseIntensity')
-    mod.equation.transform(f)
-    
-  for prefix in ('UI', 'UImin'):
-    if prefix in syms:
-      if False and lui.luh5.is_luh5(syms[prefix], prefix):
-        print('predictify %s as luh5' % prefix)
-        f = lambda x: lui.luh5.predictify(x, prefix)
-      elif lui.luh2.is_luh2(syms[prefix], prefix):
-        print('predictify %s as luh2' % prefix)
-        f = lambda x: lui.luh2.predictify(x, prefix)
-      else:
-        print('predictify %s as rcp' % prefix)
-        f = lambda x: lui.rcp.predictify(x, prefix)
-      mod.equation.transform(f)
-  if 'LandUse' in syms:
-    if lu.luh5.is_luh5(syms['LandUse'], 'LandUse'):
-      print('predictify LandUse as luh5')
-      f = lambda x: lu.luh5.predictify(x, 'LandUse')
-    elif lu.luh2.is_luh2(syms['LandUse'], 'LandUse'):
-      print('predictify LandUse as luh2')
-      f = lambda x: lu.luh2.predictify(x, 'LandUse')
-    else:
-      print('predictify LandUse as rcp')
-      f = lambda x: lu.rcp.predictify(x, 'LandUse')
-    mod.equation.transform(f)
-  if 'Contrast' in syms:
-    if lui.luh5.is_luh5(syms['Contrast'], 'Contrast'):
-      print('predictify Contrasts as lui.luh5')
-      f = lambda x: lui.luh5.as_contrast(x, 'Contrast')
-    else:
-      print('predictify Contrasts as lu.luh2')
-      f = lambda x: lu.luh2.as_contrast(x, 'Contrast')
-    mod.equation.transform(f)
-    
-    
-  mod.equation.transform(nodots)

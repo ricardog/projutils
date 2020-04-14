@@ -3,12 +3,9 @@ import importlib
 import numpy as np
 import numpy.ma as ma
 import os
-import re
 import sys
 
-from .. import lu
 from .. import utils
-from projections.r2py.tree import Node, Operator
 
 class LUH5(object):
   def __init__(self, name, intensity):
@@ -85,61 +82,3 @@ class LUH5(object):
       res = np.where(intense + res > 1, 1 - intense, res)
     res *= df[self._name]
     return res
-
-def _predictify(root, prefix):
-  newr = root.replace(prefix, '')
-  newr = newr.replace(' Vegetation', '')
-  newr = newr.replace('_Vegetation', '')
-  newr = newr.replace(' vegetation', '')
-  newr = newr.replace(' forest', '_pri')
-  newr = re.sub(r'(Minimal|Light|Intense)[ _]use',  "\\1", newr)
-  newr = re.sub(r'(Mature|Intermediate|Young)',  "\\1", newr)
-  newr = newr.lower()
-  newr = newr.replace(' ', '_')
-  if newr == 'plantation_pri':
-    name = newr
-  else:
-    name = newr.rsplit('_', 1)[0]
-  assert name in lu.luh5.types() or name in lu.luh5.types(True), 'unknown land use type %s' % root
-  return newr
-
-def as_contrast(root, prefix):
-  if isinstance(root, str) and re.match(prefix, root):
-    newr = root.replace(prefix, '')
-    newr = re.sub(r'^.*-', '', newr)
-    newr = newr.replace('Managed ', '')
-    newr = newr.replace(' use', '')
-    newr = newr.replace(' forest', '_pri')
-    predictified = _predictify(newr, '')
-    if predictified == 'primary':
-      ## If the right-hand side of a contrast is "primary" assume it
-      ## refers to primary_light_and_intense since primary_minimal is
-      ## on the LHS. 
-      predictified = 'primary_light_and_intense'
-    return predictified
-  if (isinstance(root, Node) and root.type is Operator('in') and
-      re.match(prefix, root.args[0])):
-    name = root.args[0].replace(prefix, '')
-    lhs, rhs = name.split('-', 2)
-    if lhs.lower() not in ['primary minimal', 'primary vegetation minimal',
-                           'primary vegetation minimal use']:
-      print('ignoring %s' % root.args[0])
-      return 0.0
-  return root
-
-def is_luh5(syms, prefix):
-  for sym in syms:
-    if prefix == 'Contrast':
-      sym = re.sub(r'^.*-', '', sym)
-    try:
-      _ = _predictify(sym, prefix)
-    except AssertionError:
-      print('lui.is_luh5 failed on %s' % sym)
-      return False
-  return True
-
-def predictify(root, prefix):
-  if isinstance(root, str) and re.match(prefix, root):
-    newr = _predictify(root, prefix)
-    return newr
-  return root
