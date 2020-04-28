@@ -166,7 +166,7 @@ def grumps4():
                       'unwpp-country-totals_2015.tif')
 
 def sps(scenario, year):
-  path = os.path.join(utils.data_root(), 'sps',
+  path = os.path.join(data_root(), 'sps',
                       '%s_NetCDF' % scenario.upper(),
                       'total/NetCDF')
   name = '%s_%d' % (scenario, year)
