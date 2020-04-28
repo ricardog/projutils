@@ -26,7 +26,7 @@ def init_nc(dst_ds, transform, lats, lons, years, variables):
   times = dst_ds.createVariable("time", "f8", ("time"), zlib=True,
                                 least_significant_digit=3)
   latitudes = dst_ds.createVariable("lat", "f4", ("lat"), zlib=True,
-                                    least_significant_digit = 3)
+                                    least_significant_digit=3)
   longitudes = dst_ds.createVariable("lon", "f4", ("lon"), zlib=True,
                                      least_significant_digit=3)
   crs = dst_ds.createVariable('crs', "S1", ())
@@ -60,9 +60,9 @@ def init_nc(dst_ds, transform, lats, lons, years, variables):
   out = {}
   for name, dtype, units, fill in variables:
     dst_data = dst_ds.createVariable(name, dtype,
-                                     ("time", "lat","lon"), zlib = True,
-                                     least_significant_digit = 4,
-                                     fill_value = fill)
+                                     ("time", "lat","lon"), zlib=True,
+                                     least_significant_digit=4,
+                                     fill_value=fill)
     dst_data.units = units
     dst_data.grid_mapping = 'crs'
     out[name] = dst_data
@@ -107,15 +107,15 @@ def resample(ds, bidx, resolution, resampling, out):
                                                             resolution=resolution)
   out.mask.fill(False)
   rwarp.reproject(arr, out,
-                  src_transform = ds.transform,
-                  dst_transform = newaff,
-                  width = width,
-                  height = height,
-                  src_nodata = nodata,
-                  dst_nodata = nodata,
-                  src_crs = crs,
+                  src_transform=ds.transform,
+                  dst_transform=newaff,
+                  width=width,
+                  height=height,
+                  src_nodata=nodata,
+                  dst_nodata=nodata,
+                  src_crs=crs,
                   dst_crs=crs,
-                  resampling = resampling)
+                  resampling=resampling)
   out.mask = np.where(out == nodata, 1, 0)
   return
 
