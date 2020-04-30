@@ -68,23 +68,25 @@ def init_nc(dst_ds, transform, lats, lons, years, variables):
     out[name] = dst_data
   return out
 
-def get_transform(r1, r2):
-  # Get the geo transform using r1 resolution but r2 bounds
-  dst = rasterio.open(r1)
-  src = rasterio.open(r2)
-  #src_bounds = np.around(src.bounds, decimals=3)
+def get_transform(dst, src):
+  bounds = [-180.0, -90.0, 180.0, 90.0]
   affine, width, height = rwarp.calculate_default_transform(src.crs,
                                                             dst.crs,
-                                                            src.width,
-                                                            src.height,
-                                                            *src.bounds,
+                                                            int(360 / src.res[0]),
+                                                            int(180 / src.res[0]),
+                                                            *bounds,
                                                             resolution=dst.res)
+  affine, width, height = rwarp.aligned_target(affine, width, height, dst.res)
+  return affine, width, height
+
+
+def get_lat_lon(affine, width, height):
   ul = affine * (0.5, 0.5)
   lr = affine * (width - 0.5, height - 0.5)
   lats = np.linspace(ul[1], lr[1], height)
   lons = np.linspace(ul[0], lr[0], width)
-  cratio = np.prod(dst.res) / np.prod(src.res)
-  return affine, lats, lons, dst.res, cratio
+  return lats, lons
+
 
 def mixing(year):
   if year % 10 == 0:
@@ -92,67 +94,59 @@ def mixing(year):
   y0 = year - (year % 10)
   return (y0, y0 + 10)
 
-def resample(ds, bidx, resolution, resampling, out):
-  arr = ds.read(bidx, masked=True)
-  nodata = ds.nodatavals[bidx - 1]
-  if nodata is None:  #"'nodata' must be set!"
-    nodata = -9999
-  if ds.crs is None or ds.crs.data == {}:
-    crs = rasterio.crs.CRS.from_string(u'epsg:4326')
-  else:
-    crs = ds.crs
-  newaff, width, height = rwarp.calculate_default_transform(crs, crs, ds.width,
-                                                            ds.height,
-                                                            *ds.bounds,
-                                                            resolution=resolution)
-  out.mask.fill(False)
-  rwarp.reproject(arr, out,
-                  src_transform=ds.transform,
-                  dst_transform=newaff,
-                  width=width,
-                  height=height,
-                  src_nodata=nodata,
-                  dst_nodata=nodata,
-                  src_crs=crs,
-                  dst_crs=crs,
-                  resampling=resampling)
-  out.mask = np.where(out == nodata, 1, 0)
-  return
+def resample(data, width, height, factor):
+  return data.reshape(height, factor, width, factor).sum(3).sum(1)
+
 
 @click.command()
 @click.argument('resolution', type=click.Choice(('rcp', 'luh2')))
-def main(resolution):
+@click.option('-d', '--density', is_flag=True, default=False)
+def main(resolution, density):
   years = range(2010, 2101)
   ssps = ['ssp%d' % i for i in range(1, 6)]
   variables = [(ssp, 'f4', 'ppl/km^2', -9999) for ssp in ssps]
+
   fname = f'%s/{resolution}/un_codes-full.tif' % utils.outdir()
-  affine, lats, lons, res, cfudge = get_transform(fname,
-                                                  utils.sps(ssps[0], 2010))
-  arr = (ma.empty((len(lats), len(lons)), fill_value=-9999),
-         ma.empty((len(lats), len(lons)), fill_value=-9999))
+  with rasterio.open(fname) as dst:
+    with rasterio.open(utils.sps(ssps[0], 2010)) as src:
+      affine, width, height = get_transform(dst, src)
+
+  bounds = (-180.0, -90.0, 180.0, 90.0)
+  lats, lons = get_lat_lon(affine, width, height)
+  #arr = ma.empty((len(lats), len(lons)), fill_value=-9999)
   oname = f'%s/{resolution}/sps.nc' % utils.outdir()
   with Dataset(oname, 'w') as out:
     data = init_nc(out, affine.to_gdal(), lats, lons, years, variables)
 
     for ssp in ssps:
       print(ssp)
+      source = {}
       with click.progressbar(enumerate(years), length=len(years)) as bar:
         for idx, year in bar:
           yy = mixing(year)
-          files = map(lambda y: utils.sps(ssp, y), yy)
-          rasters = tuple(map(rasterio.open, files))
-          if len(rasters) == 1:
-            resample(rasters[0], 1, res,
-                      rwarp.Resampling.average, arr[0])
-            data[ssp][idx, :, :] = np.clip(arr[0], 0, None) * cfudge
+          for yyy in yy:
+            if yyy not in source:
+              ds = rasterio.open(utils.sps(ssp, yyy))
+              source[yyy] = ds.read(1, masked=True,
+                                    window=ds.window(*bounds),
+                                    boundless=True)
+          if len(yy) == 1:
+            mixed = source[yy[0]]
           else:
             f0 = (year % 10) / 10.0
-            resample(rasters[0], 1, res,
-                      rwarp.Resampling.average, arr[0])
-            resample(rasters[1], 1, res,
-                      rwarp.Resampling.average, arr[1])
-            data[ssp][idx, :, :] = ((1 - f0) * np.clip(arr[0], 0, None) +
-                                    f0 * np.clip(arr[1], 0, None)) * cfudge
+            # This is the equivalent of a linear mix in log-space, i.e.
+            # exp((1 - f) * ln(a) + f * ln(b))
+            mixed = (ma.power(source[yy[0]], 1 - f0) *
+                     ma.power(source[yy[1]], f0))
+          #mixed.set_fill_value(-9999.0)
+          #from rasterio.plot import show
+          #import pdb; pdb.set_trace()
+          arr = resample(mixed, width, height, 4)
+          arr.set_fill_value(-9999)
+          #arr = ma.masked_equal(arr, -9999)
+          data[ssp][idx, :, :] = arr
+          #data[ssp][idx, :, :] = ((1 - f0) * np.clip(arr[0], 0, None) +
+          #                        f0 * np.clip(arr[1], 0, None)) * cfudge
 
 if __name__ == '__main__':
   main()
