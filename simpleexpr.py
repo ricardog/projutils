@@ -20,7 +20,11 @@ class SimpleExpr():
   @property
   def syms(self):
     return reval.find_inputs(self.tree)
-  
+
+  @property
+  def is_constant(self):
+    return reval.is_constant(self.tree)
+
   def eval(self, df, window=None):
     try:
       res = self.func(df)

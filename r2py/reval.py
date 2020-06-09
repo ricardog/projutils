@@ -239,6 +239,12 @@ def find_syms(root, ctx=None):
 def find_inputs(root):
   return tuple(find_input_types(root).keys())
 
+def is_constant(root):
+  assert isinstance(root, Node), 'node should be a Node'
+  if isinstance(root, Node) and root.type is Operator('I'):
+    return root.args[0]
+  return None
+
 def find_input_types(root):
   types = collections.OrderedDict()
   assert isinstance(root, Node), 'node should be a Node'
