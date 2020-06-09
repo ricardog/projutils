@@ -67,7 +67,7 @@ class RCP(object):
       res[np.where(np.isnan(res))] = 1.0
       res = np.clip(df[self.name + '_ref'] + res, 0, 1)
       if self.intensity == 'light':
-        res = np.where(df[self.as_intense] + res > 1,
-                       1 - df[self.as_intense], res)
+        intense = df[self.as_intense] / (df[self._name] + 1e-10)
+        res = np.where(intense + res > 1, 1 - intense, res)
     res *= df[self._name]
     return res
