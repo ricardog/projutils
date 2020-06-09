@@ -114,7 +114,10 @@ def main(fname, band, title, save, vmax, vmin, colorbar, coastline,
   if src.crs is None or src.crs == {} or src.crs.to_epsg() == 4326:
     src_crs = ccrs.PlateCarree()
   else:
-    src_crs = ccrs.epsg(src.crs.to_epsg())
+    src_as_epsg = src.crs.to_epsg()
+    if src_as_epsg is None:
+      raise ValueError('could not determine EPSG projection of input')
+    src_crs = ccrs.epsg(src_as_epsg)
   extent = plotting_extent(crs, src.bounds, src_crs)
   data = read_array(src, band, window=src.window(*extent))
 
