@@ -104,7 +104,7 @@ def resample(data, width, height, factor):
 def main(resolution, density):
   years = range(2010, 2101)
   ssps = ['ssp%d' % i for i in range(1, 6)]
-  variables = [(ssp, 'f4', 'ppl/km^2', -9999) for ssp in ssps]
+  variables = [(ssp, 'f4', 'ppl', -9999) for ssp in ssps]
 
   fname = f'%s/{resolution}/un_codes-full.tif' % utils.outdir()
   with rasterio.open(fname) as dst:
