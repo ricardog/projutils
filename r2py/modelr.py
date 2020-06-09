@@ -6,12 +6,13 @@ import re
 import sys
 
 class Model(object):
-  def __init__(self, name, pkg, func, inputs, out_name):
+  def __init__(self, name, pkg, func, inputs, out_name, out_range):
     self._name = name
     self._pkg = pkg
     self._func = func
     self._inputs = inputs
     self._out_name = out_name
+    self._out_range = out_range
 
   @property
   def name(self):
@@ -28,6 +29,10 @@ class Model(object):
   @property
   def output(self):
     return self._out_name
+
+  @property
+  def output_range(self):
+    return self._out_range
 
   ## FIXME: This function is PREDICTS specific and should move to out of
   ## this package.
@@ -80,7 +85,8 @@ def read_py(fname):
   func = getattr(pkg, func_name + '_st')
   inputs = getattr(pkg, 'inputs')()
   out_name = getattr(pkg, 'output')()
-  return Model(pkg_name, pkg, func, inputs, out_name)
+  out_range = getattr(pkg, 'output_range')()
+  return Model(pkg_name, pkg, func, inputs, out_name, out_range)
 
 def load(path):
   if not os.path.isfile(path):
