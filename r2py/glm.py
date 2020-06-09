@@ -92,7 +92,9 @@ class GLM():
     return reval.to_pyx(self.equation, fname)
 
   def to_numba(self, fname):
-    return reval.to_numba(self.equation, fname, self.output)
+    oseries = self.frame()[self.output]
+    orange = (oseries.min(), oseries.max())
+    return reval.to_numba(self.equation, fname, self.output, orange=orange)
 
   def eval(self, df):
     return reval.evalr(self.equation, df)

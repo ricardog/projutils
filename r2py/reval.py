@@ -341,7 +341,7 @@ ctypedef np.float_t DTYPE_t
 def rreplace(src, what, repl, num=1):
   return repl.join(src.rsplit(what, num))
 
-def to_numba(root, fname, out_name, child=False, ctx=None):
+def to_numba(root, fname, out_name, child=False, orange=None):
   inputs = find_inputs(root)
   poly_src = inspect.getsource(poly.ortho_poly_predict)
   impts = '''
@@ -379,6 +379,9 @@ def {fname}({iodecls}):
     stmts = ["%s = %s" % (name, lsyms[name]) for name in lsyms.keys()]
     expr = to_expr(root, Context('jit', 'idx'))
     nb_types = ', '.join([io_types[x][0] for x in sorted(io_types)])
+    if orange is None:
+      orange = (-np.inf, np.inf)
+    assert isinstance(orange, tuple) and len(orange) == 2
     body = '''
 @jit(#[float32[:]({nb_types})],
      cache=True, nopython=True, nogil=True)
@@ -410,6 +413,9 @@ def inputs():
 def output():
   return "{out_name}"
 
+def output_range():
+  return ({orange[0]}, {orange[1]})
+
 def func_name():
   return "{fname}"
 
@@ -418,5 +424,6 @@ def func_name():
            fname = fname,
            params = ', '.join(params),
            in_list = sorted(inputs),
-           out_name = out_name)
+           out_name = out_name,
+           orange=orange)
   return code
