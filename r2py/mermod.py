@@ -105,7 +105,7 @@ should be possible to create new classes for new model-types in lme4
     return reval.to_pyx(self.equation, fname)
 
   def to_numba(self, fname):
-    oseries = self.frame()[self.output]
+    oseries = self.frame()[self._output()]
     orange = (oseries.min(), oseries.max())
     return reval.to_numba(self.equation, fname, self.output, orange=orange)
   
@@ -165,12 +165,16 @@ should be possible to create new classes for new model-types in lme4
         res[k] = v
     return res
 
-  @property
-  def output(self):
+  def _output(self):
     '''Return the response variables in the model equation.'''
     fm = self.call_method('formula')
     formula = re.sub('\s+', ' ', fm.r_repr())
     lhs, _ = formula.split('~')
-    return re.sub(r'[ \-.$]', '_', lhs.strip())
+    return lhs.strip()
+  
+  @property
+  def output(self):
+    '''Return the pythonized response variables in the model equation.'''
+    return re.sub(r'[ \-.$]', '_', self._output())
 
   
