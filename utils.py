@@ -157,6 +157,9 @@ def luh2_transitions(scenario):
 def luh2_management(scenario):
   return _luh2_file(scenario, 'management.nc')
 
+def luh2_layer(scenario, layer):
+  return 'netcdf:' + luh2_states(scenario) + f':{layer}'
+
 def grumps1():
   return os.path.join(data_root(), 'grump1.0', 'gluds00ag')
 
