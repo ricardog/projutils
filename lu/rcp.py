@@ -76,16 +76,6 @@ def all_files(hh):
     files += syms(lu)
   return set(files)
 
-def predictify(root, prefix):
-  if isinstance(root, str) and re.match(prefix, root):
-    newr = root.replace(prefix, '')
-    newr = newr.replace(' Vegetation', '')
-    newr = newr.replace(' forest', '_pri')
-    newr = newr.lower()
-    assert newr in types(), 'unknown land use type %s' % root
-    return newr
-  return root
-
 def extract(fileobj, outdir, years):
   m = re.search('LUHa_u2(t1)?.v1(?:_([a-z]+).v\\d+(.\d+)?)?.tgz', fileobj.name)
   if m:
