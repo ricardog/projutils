@@ -105,7 +105,7 @@ def _compile(fname):
   from ..r2py import glm
   from ..r2py import lmermod
   from ..r2py import glmermod
-  from .. import predicts
+  from ..r2py import pythonify
 
   def doit(obj):
     if 'lmerMod' in obj.rclass:
@@ -117,7 +117,7 @@ def _compile(fname):
     else:
       print('Skipping object of type %s' % str(obj.rclass))
       return None
-    predicts.predictify(mod)
+    pythonify(mod)
     return mod
   
   name = os.path.basename(fname)

@@ -8,7 +8,7 @@ import sys
 from ..r2py import glm
 from ..r2py import lmermod
 from ..r2py import glmermod
-from .. import predicts
+from ..r2py import pythonify
 
 def doit(obj):
   if 'lmerMod' in obj.rclass:
@@ -20,8 +20,9 @@ def doit(obj):
   else:
     print('Skipping object of type %s' % str(obj.rclass))
     return None
-  predicts.predictify(mod)
+  pythonify(mod)
   return mod
+
 
 def main():
   if len(sys.argv) != 2:
@@ -47,3 +48,4 @@ def main():
       mod = doit(obj)
       if mod:
         ofile.write(mod.to_numba(pname))
+  return
