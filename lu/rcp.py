@@ -21,8 +21,8 @@ import tempfile
 from .. import geotools
 from .. import utils
 from .. import tiff_utils
-from ..r2py import reval as reval
-from ..r2py import rparser
+from r2py import reval as reval
+from r2py import rparser
 
 LU = {'primary': 'gothr - gfvh1 - gfvh2',
       'secondary': 'max(gsecd - gfsh1 - gfsh2 - gfsh3, 0)',

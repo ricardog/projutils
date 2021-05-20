@@ -1,6 +1,5 @@
 
 from functools import reduce
-import inflection
 import netCDF4
 import os
 

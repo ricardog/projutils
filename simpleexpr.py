@@ -2,8 +2,8 @@
 import numpy as np
 import numpy.ma as ma
 
-import projections.r2py.reval as reval
-import projections.r2py.rparser as rparser
+import r2py.reval as reval
+import r2py.rparser as rparser
 
 class SimpleExpr():
   def __init__(self, name, expr=None):

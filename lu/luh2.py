@@ -1,6 +1,6 @@
 
-from ..r2py import reval as reval
-from ..r2py import rparser
+from r2py import reval as reval
+from r2py import rparser
 
 LU = {'annual': 'c3ann + c4ann',
       'nitrogen': 'c3nfx',
