@@ -3,8 +3,9 @@
 from netCDF4 import Dataset
 import sys
 
+
 def ncdump(nc_fid, verb=True):
-    '''
+    """
     ncdump outputs dimensions, variables and their attribute information.
     The information is similar to that of NCAR's ncdump utility.
     ncdump requires a valid instance of Dataset.
@@ -24,7 +25,8 @@ def ncdump(nc_fid, verb=True):
         A Python list of the NetCDF file dimensions
     nc_vars : list
         A Python list of the NetCDF file variables
-    '''
+    """
+
     def print_ncattr(key):
         """
         Prints the NetCDF file attributes for a given key
@@ -37,8 +39,7 @@ def ncdump(nc_fid, verb=True):
         try:
             print("\t\ttype:", repr(nc_fid.variables[key].dtype))
             for ncattr in nc_fid.variables[key].ncattrs():
-                print('\t\t%s:' % ncattr,\
-                      repr(nc_fid.variables[key].getncattr(ncattr)))
+                print("\t\t%s:" % ncattr, repr(nc_fid.variables[key].getncattr(ncattr)))
         except KeyError:
             print("\t\tWARNING: %s does not contain variable attributes" % key)
 
@@ -47,7 +48,7 @@ def ncdump(nc_fid, verb=True):
     if verb:
         print("NetCDF Global Attributes:")
         for nc_attr in nc_attrs:
-            print('\t%s:' % nc_attr, repr(nc_fid.getncattr(nc_attr)))
+            print("\t%s:" % nc_attr, repr(nc_fid.getncattr(nc_attr)))
     nc_dims = [dim for dim in nc_fid.dimensions]  # list of nc dimensions
     # Dimension shape information.
     if verb:
@@ -62,18 +63,20 @@ def ncdump(nc_fid, verb=True):
         print("NetCDF variable information:")
         for var in nc_vars:
             if var not in nc_dims:
-                print('\tName:', var)
+                print("\tName:", var)
                 print("\t\tdimensions:", nc_fid.variables[var].dimensions)
                 print("\t\tsize:", nc_fid.variables[var].size)
                 print_ncattr(var)
     return nc_attrs, nc_dims, nc_vars
 
+
 def main():
     nc_f = sys.argv[1]  # Your filename
-    nc_fid = Dataset(nc_f, 'r')  # Dataset is the class behavior to open
-                                 # the file and create an instance of
-                                 # the ncCDF4 class
+    nc_fid = Dataset(nc_f, "r")  # Dataset is the class behavior to open
+    # the file and create an instance of
+    # the ncCDF4 class
     nc_attrs, nc_dims, nc_vars = ncdump(nc_fid)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

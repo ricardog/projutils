@@ -1,3 +1,2 @@
-
 def types():
-  return ['cropland', 'pasture', 'primary', 'secondary', 'urban']
+    return ["cropland", "pasture", "primary", "secondary", "urban"]

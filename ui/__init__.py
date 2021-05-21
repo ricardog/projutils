@@ -1,5 +1,5 @@
-
 import re
 
+
 def intensities():
-    return ['minimal', 'light', 'intense']
+    return ["minimal", "light", "intense"]
