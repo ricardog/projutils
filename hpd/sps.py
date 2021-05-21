@@ -6,8 +6,8 @@ import numpy.ma as ma
 from pylru import lrudecorator
 import rasterio
 
-from ..rasterset import Raster
-from ..simpleexpr import SimpleExpr
+from rasterset import Raster, SimpleExpr
+
 from .. import utils
 
 REFERENCE_YEAR = 2010

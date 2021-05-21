@@ -5,7 +5,7 @@ import numpy.ma as ma
 from pylru import lrudecorator
 import rasterio
 
-from ..rasterset import Raster
+from rasterset import Raster
 from .. import utils
 
 REFERENCE_YEAR = 2000

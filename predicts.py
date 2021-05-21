@@ -3,8 +3,8 @@ from functools import reduce
 import netCDF4
 import os
 
-from .rasterset import Raster
-from .simpleexpr import SimpleExpr
+from rasterset import Raster, SimpleExpr
+
 from . import hpd
 from . import lu
 from . import lui

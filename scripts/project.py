@@ -5,13 +5,14 @@ import click
 import os
 import urllib
 
+import rasterset
+
 from ..roads import groads
 from .. import hpd
 from .. import abundance as ab
 from .. import hpd
 from .. import lu
 from .. import lui
-from .. import rasterset
 from .. import utils
 
 class YearRangeParamType(click.ParamType):
