@@ -65,7 +65,7 @@ def rcp(scenario, year, hpd_trend):
     return rasters
 
 
-def luh5(scenario, year, plus3):
+def luh5(scenario, year, plus3):                            # noqa C901
     rasters = {}
 
     lus = [
@@ -161,7 +161,7 @@ def luh5(scenario, year, plus3):
     return rasters
 
 
-def luh2(scenario, year, hpd_trend):
+def luh2(scenario, year, hpd_trend):                        # noqa C901
     rasters = {}
     if scenario not in utils.luh2_scenarios():
         raise ValueError("Unknown scenario %s" % scenario)

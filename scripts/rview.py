@@ -115,7 +115,7 @@ def plotting_extent(crs, src_bounds, src_crs):
     ),
 )
 @click.option("-e", "--epsg", type=int)
-def main(
+def main(                                                   # noqa C901
     fname,
     band,
     title,

@@ -4,7 +4,7 @@ from netCDF4 import Dataset
 import sys
 
 
-def ncdump(nc_fid, verb=True):
+def ncdump(nc_fid, verb=True):                              # noqa C901
     """
     ncdump outputs dimensions, variables and their attribute information.
     The information is similar to that of NCAR's ncdump utility.

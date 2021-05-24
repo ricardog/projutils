@@ -250,7 +250,7 @@ class gdalInfo:
         """
         return gdal.VersionInfo("RELEASE_NAME")
 
-    def getSupportedRasters(self):
+    def getSupportedRasters(self):                          # noqa C901
         """Get list of the supported rasters.
 
         Return list of extensions of the supported rasters.
@@ -316,7 +316,7 @@ class gdalInfo:
         return list(set(self.rasterExtensions))
 
 
-def main():
+def main():                                                 # noqa C901
     global create_csv
     global fields_descript
     global fields_csv

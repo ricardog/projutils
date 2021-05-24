@@ -32,7 +32,7 @@ def to_array(path, band=1):
     return data, mask
 
 
-def to_pd(path, band=1, xsize=None, ysize=None):
+def to_pd(path, band=1, xsize=None, ysize=None):            # noqa C901
     if isinstance(path, list) or isinstance(path, tuple):
 
         def wrapper(args):

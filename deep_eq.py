@@ -28,7 +28,7 @@ import types
 default_fudge = datetime.timedelta(seconds=0, microseconds=0, days=0)
 
 
-def deep_eq(_v1, _v2, datetime_fudge=default_fudge, _assert=False):
+def deep_eq(_v1, _v2, datetime_fudge=default_fudge, _assert=False):  # noqa C901
     """
     Tests for deep equality between two python data structures recursing
     into sub-structures if necessary. Works with all python types including
@@ -130,18 +130,19 @@ def deep_eq(_v1, _v2, datetime_fudge=default_fudge, _assert=False):
             "iterables",
         )
 
-    def op(a, b):
-        _op = operator.eq
+    def _op(a, b):
+        op = operator.eq
         if type(a) == datetime.datetime and type(b) == datetime.datetime:
             s = datetime_fudge.seconds
             t1, t2 = (time.mktime(a.timetuple()), time.mktime(b.timetuple()))
             ll = t1 - t2
             ll = -ll if ll > 0 else ll
             return _check_assert((-s if s > 0 else s) <= ll, a, b, "dates")
-        return _check_assert(_op(a, b), a, b, "values")
+        return _check_assert(op(a, b), a, b, "values")
 
     c1, c2 = (_v1, _v2)
 
+    op = _op
     # guard against strings because they are iterable and their
     # elements yield iterables infinitely.
     # I N C E P T I O N

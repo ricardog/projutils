@@ -1,4 +1,3 @@
-from .wpp import WPP
-from . import wpp
-from . import sps
-from . import hyde
+from .hyde import Hyde                                      # noqa F401
+from .sps import Sps                                        # noqa F401
+from .wpp import WPP                                        # noqa F401
