@@ -49,7 +49,7 @@ class GeoLocation:
         self._check_bounds()
 
     def __str__(self):
-        degree_sign = u"\N{DEGREE SIGN}"
+        # degree_sign = u"\N{DEGREE SIGN}"
         return ("({0:.4f}deg, {1:.4f}deg) = ({2:.6f}rad, {3:.6f}rad)").format(
             self.deg_lat, self.deg_lon, self.rad_lat, self.rad_lon
         )
@@ -124,11 +124,11 @@ class GeoLocation:
         ]
 
 
-##
-## The osgeo.osr class is missing a few methods (which are available in
-## C/C++).  NOTE: the methods only work for WGS 84 (it should be simple
-## to extend them, but I don't have an example to look at.
-##
+#
+# The osgeo.osr class is missing a few methods (which are available in
+# C/C++).  NOTE: the methods only work for WGS 84 (it should be simple
+# to extend them, but I don't have an example to look at.
+#
 def srs_get_prime_meridian(srs):
     primem = srs.GetAttrValue("PRIMEM")
     if primem in ("Greenwich", "'Greenwich'"):

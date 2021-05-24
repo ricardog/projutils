@@ -10,7 +10,6 @@ import itertools
 import os
 import numpy as np
 import pandas as pd
-import platform
 import re
 import subprocess
 import sys
@@ -86,7 +85,7 @@ def all_files(hh):
 
 
 def extract(fileobj, outdir, years):
-    m = re.search("LUHa_u2(t1)?.v1(?:_([a-z]+).v\\d+(.\d+)?)?.tgz", fileobj.name)
+    m = re.search(r"LUHa_u2(t1)?.v1(?:_([a-z]+).v\\d+(.\d+)?)?.tgz", fileobj.name)
     if m:
         scenario = m.group(2) if m.group(2) else "hyde"
         series = "1700" if m.group(1) else "1500"
@@ -96,7 +95,7 @@ def extract(fileobj, outdir, years):
         )
     click.echo("Extracting RCP land use data [%s|%s]" % (scenario, series))
     allfiles = all_files(LU)
-    regexp = re.compile("updated_states/(" + "|".join(allfiles) + ").\d{4}.txt$")
+    regexp = re.compile(r"updated_states/(" + "|".join(allfiles) + r").\d{4}.txt$")
     out_files = []
     with tarfile.open(fileobj=fileobj) as tf:
         members = tf.getmembers()
@@ -112,17 +111,17 @@ def extract(fileobj, outdir, years):
                 try:
                     if years and int(base[-4:]) not in years:
                         continue
-                except:
+                except ValueError:
                     # if the file name doesn't end in a year, skip it
                     continue
-                ## NOTE: this messing around with temp files and then calling
-                ## gdal_translate is necessary because gdal doesn't provide a
-                ## way to work with file-like objects.  Ideally instead of this
-                ## mess I should be able to say
-                ##  gdal.Open(file_like_obj)
-                ## and have it read from that file descriptor.  But this doesn't
-                ## work because gdal doesn (?) provide a way to create a dataset
-                ## using a file descriptor.
+                # NOTE: this messing around with temp files and then calling
+                # gdal_translate is necessary because gdal doesn't provide a
+                # way to work with file-like objects.  Ideally instead of this
+                # mess I should be able to say
+                #  gdal.Open(file_like_obj)
+                # and have it read from that file descriptor.  But this doesn't
+                # work because gdal doesn (?) provide a way to create a dataset
+                # using a file descriptor.
                 tmpdir = os.path.join(outdir, scenario, dirn)
                 utils.mkpath(tmpdir)
                 temp = tempfile.NamedTemporaryFile(suffix=suffix)
@@ -172,11 +171,10 @@ def project(lu, in_dir, year, mask):
 
 def process(out_dir, years, maskf, what="all"):
     os.environ["GDAL_PAM_ENABLED"] = "NO"
-    geotiff = gdal.GetDriverByName("GTiff")
     in_dir = os.path.join(out_dir, "updated_states")
 
-    ## Get the mask and associated properties (geo transfer and projections).
-    ## Use WGS84 if no projection present.
+    # Get the mask and associated properties (geo transfer and projections).
+    # Use WGS84 if no projection present.
     mask_ds = gdal.Open(maskf.name)
     if mask_ds is None:
         raise RuntimeError("mask raster '%s' not found" % maskf.name)
@@ -188,7 +186,7 @@ def process(out_dir, years, maskf, what="all"):
     xsize = mask_ds.RasterXSize
     ysize = mask_ds.RasterYSize
     utils.mkpath(out_dir)
-    ## Iterate through types x years
+    # Iterate through types x years
     what = types() if what == "all" else [what]
     combos = itertools.product(what, years)
     with click.progressbar(combos, length=len(years) * len(what)) as bar:

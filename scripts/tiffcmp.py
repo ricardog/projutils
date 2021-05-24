@@ -26,7 +26,7 @@ if r1.height != r2.height:
 if r1.crs != r2.crs:
     error("crs mismatch (%s != %s)"(r1.crs, r2.crs))
 if r1.transform != r2.transform:
-    ## FiXME: this is likely broken
+    # FiXME: this is likely broken
     error("transform mismatch (%s != %s)"(r1.transform, r2.transform))
 if r1.count != r2.count:
     error("count mismatch (%d != %d)"(r1.count, r2.count))

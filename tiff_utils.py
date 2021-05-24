@@ -35,8 +35,8 @@ def to_array(path, band=1):
 def to_pd(path, band=1, xsize=None, ysize=None):
     if isinstance(path, list) or isinstance(path, tuple):
 
-        def wrapper(l):
-            for item in l:
+        def wrapper(args):
+            for item in args:
                 if len(item) == 3:
                     yield item
                 else:
@@ -81,7 +81,7 @@ def from_array(data, path, xsize, ysize, nodata=-9999, trans="", proj=""):
         ["COMPRESS=lzw", "PREDICTOR=3"],
     )
     if dst_ds is None:
-        raise RuntimeError("failed to create output raster '%s'" % oname)
+        raise RuntimeError("failed to create output raster '%s'" % path)
     dst_ds.SetProjection(proj)
     dst_ds.SetGeoTransform(trans)
     dst_ds.GetRasterBand(1).SetNoDataValue(nodata)
@@ -104,7 +104,7 @@ def from_pd(df, path, nodata=-9999, trans="", proj=""):
             ["COMPRESS=lzw", "PREDICTOR=3"],
         )
         if dst_ds is None:
-            raise RuntimeError("failed to create output raster '%s'" % oname)
+            raise RuntimeError("failed to create output raster '%s'" % path)
         dst_ds.SetProjection(proj)
         dst_ds.SetGeoTransform(trans)
         for idx, col in enumerate(df.columns):
@@ -191,7 +191,7 @@ def get_stats(tiffs):
 
     if tiffs == []:
         return [0, 0, 0, 0, []]
-    if isinstance(tiffs, basestring):
+    if isinstance(tiffs, str):
         tiffs = [tiffs]
     low = []
     high = []
@@ -241,18 +241,20 @@ def mask(name, mask):
     raster = gdal.Open(name, gdal.GA_Update)
     band = raster.GetRasterBand(1)
     raster_arr = np.array(band.ReadAsArray())
-    out_arr = np.where(nodata_mask == True, nodata, raster_arr)
+    out_arr = np.where(nodata_mask == True, nodata, raster_arr) # noqa E712
     band.WriteArray(out_arr)
     band.SetNoDataValue(nodata)
 
 
 def areg(data, mask, nodata, offset, low, high):
+    # FIXME: this function is pointless.
     src_min = np.min(ma.masked_where(mask, data))
     X = np.log(np.where(mask, src_min + offset, data + offset))
     X_min = X.min()
     X_std = (X - X_min) / (X.max() - X_min)
     scaled = X_std * (high - low) + low
-    masked = np.where(mask, nodata, scaled)
+    _ = np.where(mask, nodata, scaled)
+    return
 
 
 def regularize(src_fn, dst_fn, src_band=1, offset=1.0, low=0.0, high=1):
@@ -302,17 +304,8 @@ def regularize(src_fn, dst_fn, src_band=1, offset=1.0, low=0.0, high=1):
 
 
 if __name__ == "__main__":
-    import os
-    import re
     import sys
 
-    # os.environ['GDAL_PAM_ENABLED'] = 'NO'
-    if None:
-        regex = re.compile("%s_\d{4}.tif$" % sys.argv[1])
-        tiffs = filter(lambda x: re.match(regex, x), os.listdir("minicam/lu"))
-        mm = find_mm([os.path.join("minicam/lu", t) for t in tiffs])
-        print("min: %.4f\nmax: %.4f" % (mm[0], mm[1]))
-    else:
-        ds = gdal.Open(sys.argv[1])
-        l, h = get_min_max(ds)
-        print("min: %.2f / max: %.2f" % (l, h))
+    ds = gdal.Open(sys.argv[1])
+    l, h = get_min_max(ds)
+    print("min: %.2f / max: %.2f" % (l, h))

@@ -1,19 +1,14 @@
 #!/usr/bin/env python3
 
-import collections
 import os
 import re
 import time
-import sys
 
 import click
 from netCDF4 import Dataset
 import numpy as np
-import numpy.ma as ma
 import osr
 import rasterio
-
-import pdb
 
 from .. import geotools
 from .. import utils

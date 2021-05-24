@@ -2,9 +2,6 @@
 
 import click
 import gdal
-import math
-import numpy as np
-import numpy.ma as ma
 import os
 from osgeo import ogr
 import sys
@@ -12,7 +9,6 @@ import time
 
 from ..geotools import GeoLocation
 from .. import tiff_utils
-from .. import utils
 
 
 def create_fields(layer, db):
@@ -100,8 +96,6 @@ def distance_to_feature(p, layer, radius):
 
 def process(layer, db, quiet):
     db_layer = db.GetLayer()
-    count = layer.GetFeatureCount()
-    i = 0
     shortName = db_layer.GetName()[:10]
     start = time.time()
     radii = [10, 100, 1000]
@@ -157,7 +151,7 @@ def compute_distance(gdb_dir, shapefile):
     else:
         shape = ogr.Open(shapefile.name, 1)
     if shape is None:
-        print("Unable to open shapefile", in_shapefile)
+        print("Unable to open shapefile ", shapefile.name)
         sys.exit(1)
 
     layer = shape.GetLayer(0)
@@ -247,6 +241,11 @@ def ref_to_path(ref_str):
     if comps[1] == "log":
         return os.path.join("ds", "roads", "roads-final.tif")
     raise ValueError("unknown roads reference type '%s'" % ref_str)
+
+
+def parse_args():
+    NotImplementedError("parse_args not implemented")
+    return
 
 
 if __name__ == "__main__":

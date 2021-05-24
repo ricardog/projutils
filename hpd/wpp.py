@@ -6,7 +6,6 @@ from joblib import memory
 import numpy as np
 import pandas as pd
 
-from .. import tiff_utils
 
 MEMCACHE = memory.Memory(
     cachedir=tempfile.mkdtemp(prefix="hpd-wpp"), verbose=0, mmap_mode="r"
@@ -79,10 +78,10 @@ def get_sheets(trend, wpp):
         names = [trend.upper()]
     sheets = [pd.read_excel(wpp, name) for name in names]
     for name, sheet in zip(names, sheets):
-        ## FIXME: I store the name of the sheet (or tab) in cell (0, 0)
-        ## becuase Memcache will not preserve metadata attributes.  Once
-        ## this gets fixed in pandas, it would be cleaner to create an
-        ## attribute (name) that stores the sheet name.
+        # FIXME: I store the name of the sheet (or tab) in cell (0, 0)
+        # becuase Memcache will not preserve metadata attributes.  Once
+        # this gets fixed in pandas, it would be cleaner to create an
+        # attribute (name) that stores the sheet name.
         sheet.iloc[0, 0] = name.lower()
     return sheets
 
@@ -92,8 +91,8 @@ def get_years(sheet):
 
 
 def project(trend, sheet, countries, grumps, mask, year, nodata):
-    ## Some of the cells representing the year are treated as strings and
-    ## some as integers so check for both.
+    # Some of the cells representing the year are treated as strings and
+    # some as integers so check for both.
     col = np.logical_or(sheet.iloc[15].isin([year]), sheet.iloc[15].isin([str(year)]))
     if not np.any(col):
         raise ValueError

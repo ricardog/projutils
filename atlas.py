@@ -13,7 +13,7 @@ def atlas(data, title=None, cmap="Greens"):
 
     h, w = data.shape
     r = w * 1.0 / h
-    fig = plt.figure(
+    _ = plt.figure(
         figsize=(6.0, 6.0 / r),
         dpi=196,
         tight_layout={"w_pad": 0.0, "h_pad": 0.0, "pad": 0.0},
@@ -21,9 +21,9 @@ def atlas(data, title=None, cmap="Greens"):
     ax = plt.axes(frameon=False)
     ax.axes.get_yaxis().set_visible(False)
     ax.axes.get_xaxis().set_visible(False)
-    img = plt.imshow(data, cmap=palette)
+    _ = plt.imshow(data, cmap=palette)
     if title:
-        text = plt.text(
+        _ = plt.text(
             0.5,
             0.1,
             title,
@@ -34,3 +34,4 @@ def atlas(data, title=None, cmap="Greens"):
             transform=ax.transAxes,
         )
     plt.show()
+    return

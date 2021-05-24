@@ -4,7 +4,6 @@ import os
 import pprint
 import sys
 
-import env
 import rds
 
 if __name__ == "__main__":

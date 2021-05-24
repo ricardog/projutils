@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
 import pprint
-import rpy2.robjects as robjects
 
 from .. import rds
-from .. import lu
-from .. import lui
 
 rcp_models = [
     "out/_d5ed9724c6cb2c78b59707f69b3044e6/ab-model.rds",

@@ -3,9 +3,9 @@ from copy import copy
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.animation as animation
-import matplotlib.colors as colors
-import matplotlib.pyplot as plt
+import matplotlib.animation as animation                    # noqa E402
+import matplotlib.colors as colors                          # noqa E402
+import matplotlib.pyplot as plt                             # noqa E402
 
 # norm=colors.Normalize(vmin=-3, vmax=3))
 # norm=colors.Normalize(vmin=0, vmax=21.1048057744))

@@ -1,11 +1,9 @@
-import os
 
-import numpy as np
 import numpy.ma as ma
 from pylru import lrudecorator
 import rasterio
 
-from rasterset import Raster, SimpleExpr
+from rasterset import Raster
 
 from .. import utils
 

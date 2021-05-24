@@ -4,8 +4,6 @@ import numpy.ma as ma
 import rasterio
 import rasterio.warp as rwarp
 
-import pdb
-
 
 def reproject(filename, bidx, resolution, resampling):
     """Returns the resampled Numpy array and the output metadata
@@ -45,21 +43,20 @@ def reproject(filename, bidx, resolution, resampling):
         elif not isinstance(bidx, collections.Iterable):
             bidx = [bidx]
 
-        with rasterio.open("/tmp/reproj.tif", "w", **meta) as dst:
-            for idx in bidx:
-                arr = src.read(idx, masked=True)
-                rwarp.reproject(
-                    source=arr,
-                    destination=newarr,
-                    src_transform=src.transform,
-                    dst_transform=newaff,
-                    src_crs=src.crs,
-                    dst_crs=crs,
-                    src_nodata=src.nodatavals[idx - 1],
-                    dst_nodata=src.nodatavals[idx - 1],
-                    resampling=resampling,
-                )
-                data[idx - 1] = ma.masked_values(newarr, src.nodatavals[idx - 1])
+        for idx in bidx:
+            arr = src.read(idx, masked=True)
+            rwarp.reproject(
+                source=arr,
+                destination=newarr,
+                src_transform=src.transform,
+                dst_transform=newaff,
+                src_crs=src.crs,
+                dst_crs=crs,
+                src_nodata=src.nodatavals[idx - 1],
+                dst_nodata=src.nodatavals[idx - 1],
+                resampling=resampling,
+            )
+            data[idx - 1] = ma.masked_values(newarr, src.nodatavals[idx - 1])
     return meta, data
 
 

@@ -4,16 +4,13 @@ import time
 times = []
 times.append(["", time.time()])
 
-import cProfile
-import gdal
-import numpy as np
-import pandas as pd
-import rpy2.robjects as robjects
+import gdal                                                 # noqa E402
+import numpy as np                                          # noqa E402
+import pandas as pd                                         # noqa E402
+import rpy2.robjects as robjects                            # noqa E402
 
-import env
-import glm
-import poly
-import eval as myeval
+import glm                                                  # noqa E402
+import poly                                                 # noqa E402
 
 times.append(["import", time.time()])
 

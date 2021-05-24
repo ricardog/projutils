@@ -9,8 +9,6 @@ import osr
 import sys
 import time
 
-import geotools
-
 
 def main():
     if len(sys.argv) != 2:
@@ -22,9 +20,9 @@ def main():
         print("Error: could not open file '%s'" % sys.argv[1])
         sys.exit()
     src_data = src_ds.GetRasterBand(1).ReadAsArray()
-    src_nodata = src_ds.GetRasterBand(1).GetNoDataValue()
     src_data = np.where(
-        np.isclose(src_data, src_ds.GetRasterBand(1).GetNoDataValue()), -9999, src_data
+        np.isclose(src_data, src_ds.GetRasterBand(1).GetNoDataValue()),
+        -9999, src_data
     )
     (y, x) = src_data.shape
     src_trans = src_ds.GetGeoTransform()

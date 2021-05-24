@@ -5,7 +5,6 @@ import rpy2.robjects as robjects
 import sys
 import time
 
-import env
 import glm
 
 print("starting")

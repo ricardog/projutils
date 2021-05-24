@@ -11,10 +11,6 @@ import osr
 import rasterio
 import rasterio.warp as rwarp
 
-import pdb
-
-# from .. import geotools
-# from .. import utils
 import projections.utils as utils
 import projections.geotools as geotools
 

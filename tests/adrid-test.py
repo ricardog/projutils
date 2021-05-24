@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 
-import gdal
-import numpy as np
-import os
 import pandas as pd
 import pprint
-import sys
 
-import env
 import hpd.wpp
 import lu.rcp
 import lui.rcp
@@ -51,12 +46,12 @@ df["logHPD.rs"] = tu.areg(hpd_data + 1, mask, -9999).reshape(-1)
 
 # Calculate needed land use data
 for t in syms["LandUse"].keys():
-    df[k + t] = lu.rcp.project(t.lower(), rcp_dir, year).reshape(-1)
+    df[t] = lu.rcp.project(t.lower(), rcp_dir, year).reshape(-1)
 
 # Calculate land use intensity data -- note that it needs to "compute"
 # primary
 for t in syms["UImin2"].keys():
-    df[k + t] = lui.rcp.project(t.lower(), df, un_sub, rcp_dir, lui_dir).reshape(-1)
+    df[t] = lui.rcp.project(t.lower(), df, un_sub, rcp_dir, lui_dir).reshape(-1)
 
 # Drop rows that have NA, e.g. everything that's water only
 df = df.dropna()

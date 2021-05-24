@@ -2,7 +2,6 @@
 
 from pyparsing import ParseException
 
-import env
 import rparser
 
 if __name__ == "__main__":
@@ -18,7 +17,7 @@ if __name__ == "__main__":
         "[['poly', [['log', [['cropland', '+', 1]]], 3]]]",
         "[['poly', [['log', [['cropland', '+', 1]]], 3], 2]]",
         "[[['factor', ['unSub'], 143], ':', ['poly', [['log', [['cropland', '+', 1]]], 3], 2]]]",
-        "[[['factor', ['unSub'], 143], ':', ['poly', [['log', [['cropland', '+', 1]]], 3], 3], ':', ['poly', [['log', [['hpd', '+', 1]]], 3], 2]]]",
+        "[[['factor', ['unSub'], 143], ':', ['poly', [['log', [['cropland', '+', 1]]], 3], 3], ':', ['poly', [['log', [['hpd', '+', 1]]], 3], 2]]]", # noqa E501
     ]
     for i, t in enumerate(tests):
         result = rparser.PARSER.parseString(t)

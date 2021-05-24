@@ -2,9 +2,7 @@
 
 import os
 import rpy2.robjects as robjects
-import sys
 
-import env
 import glm
 import rds
 import utils

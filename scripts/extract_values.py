@@ -32,13 +32,14 @@
 try:
     from osgeo import gdal, ogr, osr
 except ImportError:
-    import gdal, ogr, osr
+    import gdal
+    import ogr
+    import osr
 
 import sys
-import os, os.path
-import time
+import os
+import os.path
 import glob
-from itertools import cycle
 import math
 import numpy as np
 
@@ -112,7 +113,7 @@ def invertGeoTransform(geoTransform):
     outGeoTransform[4] = -geoTransform[4] * invDet
 
     outGeoTransform[2] = -geoTransform[2] * invDet
-    outGeoTransfrom[5] = geoTransform[1] * invDet
+    outGeoTransform[5] = geoTransform[1] * invDet
 
     outGeoTransform[0] = (
         geoTransform[2] * geoTransform[3] - geoTransform[0] * geoTransform[5]
@@ -130,7 +131,7 @@ def invertGeoTransform(geoTransform):
 def usage():
     """Show usage synopsis."""
     print(
-        "Usage: extract_values.py [-q] [-r] [-g] [-f] point_shapefile [raster_file(s)] [-d directory_with_rasters] [-rl list,of,rasters] [-e extension]"
+        "Usage: extract_values.py [-q] [-r] [-g] [-f] point_shapefile [raster_file(s)] [-d directory_with_rasters] [-rl list,of,rasters] [-e extension]"  # noqa E501
     )
     sys.exit(1)
 
@@ -150,6 +151,11 @@ def fileNamesToFileInfos(names):
             bandCount += fi.bands
 
     return infos, bandCount
+
+
+def extract_csv(*args):
+    NotImplementedError("extract_csv not implemented")
+    return
 
 
 def createFields(inLayer, infos):
@@ -249,7 +255,7 @@ class gdalInfo:
 
         Return list of extensions of the supported rasters.
         """
-        if self.rasterExtensions != None:
+        if self.rasterExtensions is not None:
             return self.rasterExtensions
 
         # first get the GDAL driver manager
@@ -262,7 +268,7 @@ class gdalInfo:
         # for each loaded GDAL driver
         for i in range(gdal.GetDriverCount()):
             driver = gdal.GetDriver(i)
-            if driver == None:
+            if driver is None:
                 print("Unable to get driver", i)
                 continue
 
@@ -272,7 +278,7 @@ class gdalInfo:
             description = driver.GetDescription()
             extensions = []
             metadata = driver.GetMetadata()
-            if metadata.has_key(gdal.DMD_EXTENSION):
+            if gdal.DMD_EXTENSION in metadata:
                 extensions = metadata[gdal.DMD_EXTENSION]
 
             ext = []
@@ -285,7 +291,7 @@ class gdalInfo:
                     if description == "JPEG2000" or description.startswith(
                         "JP2"
                     ):  # JP2ECW, JP2KAK, JP2MrSID
-                        if jp2Driver != None:
+                        if jp2Driver is not None:
                             continue
                         jp2Driver = driver
                         ext.append("*.j2k")
@@ -330,7 +336,7 @@ def main():
     gdal.AllRegister()
 
     formats = gdalInfo().getSupportedRasters()
-    ###  print formats
+    #  print formats
 
     args = gdal.GeneralCmdLineProcessor(sys.argv)
 
@@ -358,9 +364,9 @@ def main():
             rasterPaths = args[i]
             rasterPaths2 = []
             for rasterPath in rasterPaths.split(","):
-                if os.path.exists(rasterPath) == False:
+                if os.path.exists(rasterPath) is False:
                     print("Directory " + rasterPath + " does not exist")
-                if rasterPath[len(rasterPath) - 1 :] != os.sep:
+                if rasterPath[len(rasterPath) - 1:] != os.sep:
                     rasterPath = rasterPath + os.sep
                 rasterPaths2.append(rasterPath)
             if len(rasterPaths2) == 0:
@@ -370,7 +376,7 @@ def main():
             ext = args[i]
         elif arg == "-nodata":
             i += 1
-            nodata = int(args[i])
+            nodata = int(args[i])                           # noqa F841
         elif inShapeName is None:
             inShapeName = arg
         elif arg != "-d" and arg != "-rl":
@@ -451,7 +457,6 @@ def main():
     if not quiet:
         pb = ProgressBar(max + 1, 65)
     i = 0
-    start = time.time()
     # process points and rasters
     fi = 0
     if create_csv:

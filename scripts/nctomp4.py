@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import netCDF4
-import numpy as np
 import os
 import sys
 

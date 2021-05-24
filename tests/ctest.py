@@ -3,7 +3,6 @@
 import os
 import rpy2.robjects as robjects
 
-import env
 import glm
 import utils
 

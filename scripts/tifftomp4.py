@@ -2,24 +2,17 @@
 
 import matplotlib
 
-matplotlib.use("Agg")
-import matplotlib.colors as colors
-
 import argparse
-import itertools
-import json
-import math
-import numpy as np
 import os
 import rasterio
-import tempfile
-import shutil
-import subprocess
 import sys
 
-from ..progressbar import ProgressBar
 from ..mp4_utils import to_mp4
 from .. import tiff_utils
+
+
+matplotlib.use("Agg")
+import matplotlib.colors as colors                          # noqa E402
 
 
 def parse_fname2(fname):
@@ -124,7 +117,7 @@ def main():
     args = parse_args()
     if args.stats:
         stats = get_stats(args.files)
-        return
+        return stats
     convert(args.title, args.fps, args.palette, args.band, args.out, args.files)
 
 

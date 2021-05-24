@@ -1,13 +1,11 @@
 import argparse
 import errno
 import os
-import platform
 from pylru import lrudecorator
 import re
 import subprocess
 import sys
 import threading
-import time
 
 
 class FullPaths(argparse.Action):
@@ -137,10 +135,10 @@ def luh2_dir():
 
 def luh2_scenarios():
     prefix = luh2_prefix() + "SSP"
-    l = len(prefix)
+    ll = len(prefix)
     scenarios = sorted(
         filter(
-            lambda p: (p == "historical" or p[0:l] == prefix), os.listdir(luh2_dir())
+            lambda p: (p == "historical" or p[0:ll] == prefix), os.listdir(luh2_dir())
         )
     )
     return tuple(re.sub("^" + luh2_prefix(), "", x).lower() for x in scenarios)
@@ -206,7 +204,6 @@ def sps(scenario, year):
         data_root(), "sps", "%s_NetCDF" % scenario.upper(), "total/NetCDF"
     )
     name = "%s_%d" % (scenario, year)
-    fname = os.path.join(path, "%s.nc" % name)
     return "netcdf:%s/%s.nc:%s" % (path, name, name)
 
 

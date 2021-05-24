@@ -2,7 +2,6 @@
 
 import gdal
 
-import env
 import poly
 
 ds = gdal.Open("/out/hpd/wpp/low.tif")

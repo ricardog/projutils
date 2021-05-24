@@ -4,13 +4,13 @@
 import click
 import os
 import urllib
+from urllib.parse import urlparse
 
 import rasterset
 
 from ..roads import groads
 from .. import hpd
 from .. import abundance as ab
-from .. import hpd
 from .. import lu
 from .. import lui
 from .. import utils
@@ -80,9 +80,9 @@ def cli():
     pass
 
 
-##
-## Human population density
-##
+#
+# Human population density
+#
 @cli.group()
 def population():
     pass
@@ -122,9 +122,9 @@ def wpp(current, countries, xls, trend, years):
     hpd.wpp.process(countries, current, xls.name, trend, years, out_dir)
 
 
-##
-## Land use
-##
+#
+# Land use
+#
 @cli.group()
 def land_use():
     pass
@@ -192,9 +192,9 @@ def project(scenario, years, mask, name):
     lu.rcp.process(out_dir, years, mask, name)
 
 
-##
-## Land use intensity
-##
+#
+# Land use intensity
+#
 @cli.group()
 def land_use_intensity():
     pass
@@ -250,7 +250,7 @@ def compile(name, model_dir, j=-1):
     metavar="jobs",
 )
 @click.option("-r", is_flag=True, help="Use R code for projection")
-def project(
+def project(                                                # noqa F811
     name,
     hpd_reference,
     hpd_spec,
@@ -293,9 +293,9 @@ def project(
             )
 
 
-##
-## Species richness
-##
+#
+# Species richness
+#
 @cli.group()
 def species_richness():
     pass
@@ -311,13 +311,13 @@ def build(diversity_db, roads_db, hpd_db):
 
 @species_richness.command()
 @click.argument("years", type=YEAR_RANGE)
-def project(years):
+def project(years):                                         # noqa F811
     click.echo("Projecting species richness model")
 
 
-##
-## Roads
-##
+#
+# Roads
+#
 @cli.group()
 def roads():
     pass
@@ -417,16 +417,16 @@ def regularize(src_raster, dst_raster, band=1, offset=1, min=0.0, max=1.0):
     groads.regularize(src_raster.name, dst_raster.name, band, offset, min, max)
 
 
-##
-## Roads
-##
+#
+# Roads
+#
 @cli.group()
 def abundance():
     pass
 
 
 @abundance.command()
-def fit():
+def fit():                                                  # noqa F811
     """Fit PREDICTS total abundance model."""
 
     click.echo("Fitting total abundance")
@@ -444,7 +444,7 @@ def fit():
 )
 @click.argument("hpd-ref", type=click.STRING)
 @click.argument("lu-ref", type=click.STRING)
-def project(hpd_ref, lu_ref, mask):
+def project(hpd_ref, lu_ref, mask):                         # noqa F811
     """Project total abundance using the PREDICTS model.
 
     \b
