@@ -5,9 +5,10 @@ from netCDF4 import Dataset
 import numpy as np
 import numpy.ma as ma
 import rasterio
+from rasterio.crs import CRS
 import rasterio.warp as rwarp
 import time
-import osr
+from osgeo import osr
 
 from .. import geotools
 from .. import utils
@@ -52,14 +53,10 @@ def init_nc(dst_ds, transform, lats, lons, years, variables):
     longitudes[:] = lons
     times[:] = years
 
-    srs = osr.SpatialReference()
-    srs.ImportFromWkt(geotools.WGS84_WKT)
     crs.grid_mapping_name = "latitude_longitude"
-    crs.spatial_ref = srs.ExportToWkt()
+    crs.spatial_ref = CRS.from_epsg(4326).to_wkt()
     crs.GeoTransform = " ".join(map(str, transform))
     crs.longitude_of_prime_meridian = 0
-    crs.semi_major_axis = osr.SRS_WGS84_SEMIMAJOR
-    crs.inverse_flattening = osr.SRS_WGS84_INVFLATTENING
 
     out = {}
     for name, dtype, units, fill in variables:
@@ -157,7 +154,7 @@ def main(resolution, density):
                     # mixed.set_fill_value(-9999.0)
                     # from rasterio.plot import show
                     # import pdb; pdb.set_trace()
-                    arr = resample(mixed, width, height, 4)
+                    arr = resample(mixed, width, height, 2)
                     arr.set_fill_value(-9999)
                     # arr = ma.masked_equal(arr, -9999)
                     data[ssp][idx, :, :] = arr
