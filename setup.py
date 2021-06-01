@@ -1,15 +1,20 @@
 from setuptools import setup, find_packages
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 setup(
-    name="projections",
+    name="projutils",
     version="0.1",
     author="Ricardo E. Gonzalez",
     author_email="ricardog@itinerisinc.com",
-    description="Spatio-temporal projections of R models using python",
+    description="Utilities for generating and visualizing raster maps",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     python_requires=">=3.8.3",
-    url="https://github.com/NaturalHistoryMuseum/raster-project",
+    url="https://github.com/ricardog/projutils",
     project_urls={
-        "Bug Tracker": "https://github.com/ricardog/raster-project/issues",
+        "Bug Tracker": "https://github.com/ricardog/projutils/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",
