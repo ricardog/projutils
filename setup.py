@@ -11,7 +11,7 @@ setup(
     description="Utilities for generating and visualizing raster maps",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    python_requires=">=3.8.3",
+    python_requires=">=3.7",
     url="https://github.com/ricardog/projutils",
     project_urls={
         "Bug Tracker": "https://github.com/ricardog/projutils/issues",
