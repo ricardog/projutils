@@ -48,16 +48,16 @@ setup(
     ],
     entry_points="""
         [console_scripts]
-        extract_values=projections.scripts.extract_values:main
-        gen_hyde=projections.scripts.gen_hyde:main
-        gen_sps=projections.scripts.gen_sps:main
-        hyde2nc=projections.scripts.hyde2nc:main
-        nc_dump=projections.scripts.nc_dump:main
+        extract_values=projutils.scripts.extract_values:main
+        gen_hyde=projutils.scripts.gen_hyde:main
+        gen_sps=projutils.scripts.gen_sps:main
+        hyde2nc=projutils.scripts.hyde2nc:main
+        nc_dump=projutils.scripts.nc_dump:main
 
-        nctomp4=projections.scripts.nctomp4:main
-        project=projections.scripts.project:cli
-        rview=projections.scripts.rview:main
-        tifftomp4=projections.scripts.tifftomp4:main
-        tiffcmp=projections.scripts.tiffcmp:main
+        nctomp4=projutils.scripts.nctomp4:main
+        project=projutils.scripts.project:cli
+        rview=projutils.scripts.rview:main
+        tifftomp4=projutils.scripts.tifftomp4:main
+        tiffcmp=projutils.scripts.tiffcmp:main
     """,
 )
