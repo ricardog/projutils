@@ -34,8 +34,8 @@ def years():
         return tuple(map(lambda idx: int(ds.tags(idx)["NETCDF_DIM_time"]), ds.indexes))
 
 
-def raster(version, year):
-    if year not in years(version):
+def raster(year):
+    if year not in years():
         raise RuntimeError("year (%d) not present in HYDE dataset)" % year)
     return {
         "hpd": Raster(
