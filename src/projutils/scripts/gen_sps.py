@@ -1,11 +1,16 @@
 #!/usr/bin/env python
 
+from affine import Affine
 import click
+import datetime
+import math
 from netCDF4 import Dataset
 import numpy as np
 import numpy.ma as ma
 import rasterio
 from rasterio.crs import CRS
+from rasterio.transform import rowcol
+from rasterio.windows import Window
 import rasterio.warp as rwarp
 import time
 from osgeo import osr
@@ -26,7 +31,7 @@ def init_nc(dst_ds, transform, lats, lons, years, variables):
 
     # Create variables
     times = dst_ds.createVariable(
-        "time", "f8", ("time"), zlib=True, least_significant_digit=3
+        "time", "i4", ("time"), zlib=True
     )
     latitudes = dst_ds.createVariable(
         "lat", "f4", ("lat"), zlib=True, least_significant_digit=3
@@ -43,7 +48,7 @@ def init_nc(dst_ds, transform, lats, lons, years, variables):
     latitudes.long_name = "latitude"
     longitudes.units = "degrees_east"
     longitudes.long_name = "longitude"
-    times.units = "years since 2010-01-01 00:00:00.0"
+    times.units = "days since 1970-01-01 00:00:00.0"
     times.calendar = "gregorian"
     times.standard_name = "time"
     times.axis = "T"
@@ -51,7 +56,8 @@ def init_nc(dst_ds, transform, lats, lons, years, variables):
     # Assign data to variables
     latitudes[:] = lats
     longitudes[:] = lons
-    times[:] = years
+    epoch = datetime.datetime(1970, 1, 1)
+    times[:] = [(datetime.datetime(y, 1, 1) - epoch).days for y in years]
 
     crs.grid_mapping_name = "latitude_longitude"
     crs.spatial_ref = CRS.from_epsg(4326).to_wkt()
@@ -74,7 +80,34 @@ def init_nc(dst_ds, transform, lats, lons, years, variables):
     return out
 
 
-def get_transform(dst, src):
+def round_window(win):
+    return win.round_offsets('floor').round_lengths('ceil')
+
+
+def calc_window(xform, left, top, right, bottom):
+    rows, cols = rowcol(xform,
+                        [left, right, right, left],
+                        [top, top, bottom, bottom],
+                        op=float)
+    row_start, row_stop = min(rows), max(rows)
+    col_start, col_stop = min(cols), max(cols)
+    win = Window(col_off=col_start,
+                 row_off=row_start,
+                 width=max(col_stop - col_start, 0.0),
+                 height=max(row_stop - row_start, 0.0),
+                 )
+    return round_window(win)
+
+
+def get_transform(bounds, res):
+    xform = (Affine.translation(bounds.left, bounds.top) *
+                 Affine.scale(res[0], res[1] * -1) *
+                 Affine.identity())
+    window = calc_window(xform, *bounds)
+    return xform, window.width, window.height
+
+
+def get_transform2(dst, src):
     bounds = [-180.0, -90.0, 180.0, 90.0]
     affine, width, height = rwarp.calculate_default_transform(
         src.crs,
@@ -114,18 +147,21 @@ def main(resolution, density):
     years = range(2010, 2101)
     ssps = ["ssp%d" % i for i in range(1, 6)]
     variables = [(ssp, "f4", "ppl", -9999) for ssp in ssps]
+    factor = 2 if resolution == 'luh2' else 4
 
     fname = f"%s/{resolution}/un_codes-full.tif" % utils.outdir()
-    with rasterio.open(fname) as dst:
-        with rasterio.open(utils.sps(ssps[0], 2010)) as src:
-            affine, width, height = get_transform(dst, src)
-
-    bounds = (-180.0, -90.0, 180.0, 90.0)
-    lats, lons = get_lat_lon(affine, width, height)
-    # arr = ma.empty((len(lats), len(lons)), fill_value=-9999)
+    with rasterio.open(fname) as ref:
+        res = ref.res
+    with rasterio.open(utils.sps(ssps[0], 2010)) as src:
+        xform, width, height = get_transform(src.bounds, res)
+        window = Window(col_off=0, row_off=0,
+                        width=math.ceil(src.width / factor) * factor,
+                        height=math.ceil(src.height / factor) * factor)
+        
+    lats, lons = get_lat_lon(xform, width, height)
     oname = f"%s/{resolution}/sps.nc" % utils.outdir()
     with Dataset(oname, "w") as out:
-        data = init_nc(out, affine.to_gdal(), lats, lons, years, variables)
+        data = init_nc(out, xform.to_gdal(), lats, lons, years, variables)
 
         for ssp in ssps:
             print(ssp)
@@ -136,12 +172,9 @@ def main(resolution, density):
                     for yyy in yy:
                         if yyy not in source:
                             ds = rasterio.open(utils.sps(ssp, yyy))
-                            source[yyy] = ds.read(
-                                1,
-                                masked=True,
-                                window=ds.window(*bounds),
-                                boundless=True,
-                            )
+                            source[yyy] = ds.read(1, masked=True,
+                                                  window=window,
+                                                  boundless=True)
                     if len(yy) == 1:
                         mixed = source[yy[0]]
                     else:
@@ -151,15 +184,11 @@ def main(resolution, density):
                         mixed = ma.power(source[yy[0]], 1 - f0) * ma.power(
                             source[yy[1]], f0
                         )
-                    # mixed.set_fill_value(-9999.0)
-                    # from rasterio.plot import show
-                    # import pdb; pdb.set_trace()
-                    arr = resample(mixed, width, height, 2)
+                    arr = resample(mixed, width, height, factor)
                     arr.set_fill_value(-9999)
                     # arr = ma.masked_equal(arr, -9999)
                     data[ssp][idx, :, :] = arr
-                    # data[ssp][idx, :, :] = ((1 - f0) * np.clip(arr[0], 0, None) +
-                    #                        f0 * np.clip(arr[1], 0, None)) * cfudge
+    return
 
 
 if __name__ == "__main__":
