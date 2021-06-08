@@ -1,4 +1,5 @@
 
+import datetime
 import numpy.ma as ma
 from pylru import lrudecorator
 import rasterio
@@ -32,8 +33,12 @@ class Sps(object):
 
 @lrudecorator(10)
 def years(ssp):
+    def days2year(days):
+        return (datetime.datetime(1970, 1, 1) +
+                datetime.timedelta(int(days))).year
     with rasterio.open("netcdf:%s/luh2/sps.nc:%s" % (utils.outdir(), ssp)) as ds:
-        return tuple(map(lambda idx: int(ds.tags(idx)["NETCDF_DIM_time"]), ds.indexes))
+        return tuple(map(lambda idx: days2year(ds.tags(idx)["NETCDF_DIM_time"]),
+                         ds.indexes))
 
 
 def raster(ssp, year, res="luh2"):
