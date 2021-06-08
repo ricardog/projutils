@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="projutils",
-    version="0.2",
+    version="0.2.0",
     author="Ricardo E. Gonzalez",
     author_email="ricardog@itinerisinc.com",
     description="Utilities for generating and visualizing raster maps",
