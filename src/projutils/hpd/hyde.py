@@ -39,7 +39,6 @@ def raster(version, year):
         raise RuntimeError("year (%d) not present in HYDE dataset)" % year)
     return {
         "hpd": Raster(
-            "hpd",
             "netcdf:%s/luh2/hyde.nc:popd" % utils.outdir(),
             band=years().index(year),
         )
@@ -52,12 +51,12 @@ def scale_grumps(year):
         raise RuntimeError("year %d not available in HYDE projection" % year)
     ref_band = years().index(REFERENCE_YEAR)
     year_band = years().index(year)
-    rasters["grumps"] = Raster("grumps", "%s/luh2/gluds00ag.tif" % utils.outdir())
+    rasters["grumps"] = Raster("%s/luh2/gluds00ag.tif" % utils.outdir())
     rasters["hpd_ref"] = Raster(
-        "hpd_ref", "netcdf:%s/luh2/hyde.nc:popd" % utils.outdir(), band=ref_band + 1
+        "netcdf:%s/luh2/hyde.nc:popd" % utils.outdir(), band=ref_band + 1
     )
     rasters["hpd_proj"] = Raster(
-        "hpd_proj", "netcdf:%s/luh2/hyde.nc:popd" % utils.outdir(), band=year_band + 1
+        "netcdf:%s/luh2/hyde.nc:popd" % utils.outdir(), band=year_band + 1
     )
     rasters["hpd"] = Hyde(year)
     return rasters

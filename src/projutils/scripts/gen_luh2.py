@@ -79,14 +79,14 @@ def luh2_types(ssp, year):
         "c4per",
         "c3nfx",
     ]:
-        res[lu] = Raster(lu, "%s:%s" % (path, lu), bidx)
+        res[lu] = Raster("%s:%s" % (path, lu), bidx)
     for secd in luh2_secd_types():
-        res[secd] = Raster(secd, "%s:%s" % (luh2_secd(ssp), secd), bidx)
+        res[secd] = Raster("%s:%s" % (luh2_secd(ssp), secd), bidx)
     return res
 
 
 def rset_add(rasters, name, expr):
-    rasters[name] = SimpleExpr(name, expr)
+    rasters[name] = SimpleExpr(expr)
 
 
 def luh2_rasterset(scenario, year):
