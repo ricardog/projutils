@@ -48,8 +48,8 @@ def outdir():
     """Returns the root of the output folder."""
     if "OUTDIR" in os.environ:
         outdir = os.environ["OUTDIR"]
-    elif os.path.isdir("/out"):
-        outdir = "/out"
+    elif os.path.isdir("/mnt/predicts"):
+        outdir = "/mnt/predicts"
         os.environ["OUTDIR"] = os.path.abspath(outdir)
     else:
         raise RuntimeError("please set OUTDIR")
@@ -72,8 +72,8 @@ def data_root():
     """
     if "DATA_ROOT" in os.environ:
         dr = os.environ["DATA_ROOT"]
-    elif os.path.isdir("/data"):
-        dr = "/data"
+    elif os.path.isdir("/mnt/data"):
+        dr = "/mnt/data"
         os.environ["DATA_ROOT"] = os.path.abspath(dr)
     else:
         raise RuntimeError("please set DATA_ROOT")
