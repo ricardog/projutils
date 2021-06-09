@@ -46,6 +46,7 @@ setup(
         "tqdm",
         "xlrd",
     ],
+    extras_require={"dev": ["black", "flake8", "pylint", "pytest"]},
     entry_points="""
         [console_scripts]
         extract_values=projutils.scripts.extract_values:main
