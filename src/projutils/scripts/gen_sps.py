@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 
+import time
+
 from affine import Affine
 import click
 import datetime
-import math
 from netCDF4 import Dataset
 import numpy as np
 import numpy.ma as ma
 import rasterio
+from rasterio.coords import BoundingBox
 from rasterio.crs import CRS
 from rasterio.transform import rowcol
 from rasterio.windows import Window
-import rasterio.warp as rwarp
-import time
-from osgeo import osr
 
-from .. import geotools
 from .. import utils
 
 
@@ -101,24 +99,10 @@ def calc_window(xform, left, top, right, bottom):
 
 def get_transform(bounds, res):
     xform = (Affine.translation(bounds.left, bounds.top) *
-                 Affine.scale(res[0], res[1] * -1) *
-                 Affine.identity())
-    window = calc_window(xform, *bounds)
-    return xform, window.width, window.height
-
-
-def get_transform2(dst, src):
-    bounds = [-180.0, -90.0, 180.0, 90.0]
-    affine, width, height = rwarp.calculate_default_transform(
-        src.crs,
-        dst.crs,
-        int(360 / src.res[0]),
-        int(180 / src.res[0]),
-        *bounds,
-        resolution=dst.res,
-    )
-    affine, width, height = rwarp.aligned_target(affine, width, height, dst.res)
-    return affine, width, height
+             Affine.scale(res[0], res[1] * -1) *
+             Affine.identity())
+    # window = calc_window(xform, *bounds)
+    return xform # , window.width, window.height
 
 
 def get_lat_lon(affine, width, height):
@@ -151,14 +135,12 @@ def main(resolution, density):
 
     fname = f"%s/{resolution}/un_codes-full.tif" % utils.outdir()
     with rasterio.open(fname) as ref:
-        res = ref.res
-    with rasterio.open(utils.sps(ssps[0], 2010)) as src:
-        xform, width, height = get_transform(src.bounds, res)
-        window = Window(col_off=0, row_off=0,
-                        width=math.ceil(src.width / factor) * factor,
-                        height=math.ceil(src.height / factor) * factor)
-        
-    lats, lons = get_lat_lon(xform, width, height)
+        with rasterio.open(utils.sps(ssps[0], 2010)) as src:
+            window = round_window(ref.window(*src.bounds))
+            bounds = BoundingBox(*ref.window_bounds(window))
+            src_window = round_window(src.window(*bounds))
+            xform = get_transform(bounds, ref.res)
+    lats, lons = get_lat_lon(xform, window.width, window.height)
     oname = f"%s/{resolution}/sps.nc" % utils.outdir()
     with Dataset(oname, "w") as out:
         data = init_nc(out, xform.to_gdal(), lats, lons, years, variables)
@@ -173,7 +155,7 @@ def main(resolution, density):
                         if yyy not in source:
                             ds = rasterio.open(utils.sps(ssp, yyy))
                             source[yyy] = ds.read(1, masked=True,
-                                                  window=window,
+                                                  window=src_window,
                                                   boundless=True)
                     if len(yy) == 1:
                         mixed = source[yy[0]]
@@ -184,7 +166,7 @@ def main(resolution, density):
                         mixed = ma.power(source[yy[0]], 1 - f0) * ma.power(
                             source[yy[1]], f0
                         )
-                    arr = resample(mixed, width, height, factor)
+                    arr = resample(mixed, window.width, window.height, factor)
                     arr.set_fill_value(-9999)
                     # arr = ma.masked_equal(arr, -9999)
                     data[ssp][idx, :, :] = arr
