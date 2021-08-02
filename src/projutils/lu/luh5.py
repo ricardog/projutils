@@ -17,7 +17,7 @@ LUp3 = {
     "pasture": "pastr + range",
     "urban": "urban",
     "plantation_pri": "c3per + c4per",
-    "plantation_sec": "0",
+    "plantation_sec": 0,
 }
 
 
@@ -25,3 +25,9 @@ def types(plus3=False):
     if plus3:
         return sorted(LUp3.keys())
     return sorted(LU.keys())
+
+
+def types2(plus3=False):
+    if plus3:
+        return LUp3
+    return LU

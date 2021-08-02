@@ -16,7 +16,9 @@ class LUH5(object):
             self._inputs = [name]
             self._pkg_func = lambda x: np.full_like(x.values()[0], 0.333)
         else:
-            if name in ("secdy", "secdi", "secdm"):
+            if name in ("secdy", "secdi", "secdm",
+                        "young_secondary", "intermediate_secondary",
+                        "mature_secondary"):
                 mod_name = "secondary"
             else:
                 mod_name = name
