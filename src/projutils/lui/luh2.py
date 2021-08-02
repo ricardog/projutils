@@ -81,7 +81,7 @@ class LUH2(object):
         return self._intensity
 
     @property
-    def syms(self):
+    def inputs(self):
         return self._inputs
 
     def eval(self, df):

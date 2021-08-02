@@ -56,7 +56,7 @@ class RCP(object):
         return self._intensity
 
     @property
-    def syms(self):
+    def inputs(self):
         return self._inputs + [self.name + "_ref"]
 
     def eval(self, df):

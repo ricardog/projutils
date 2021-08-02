@@ -21,7 +21,7 @@ class Sps(object):
         return self._year
 
     @property
-    def syms(self):
+    def inputs(self):
         return ["grumps", "hpd_ref", "hpd_proj"]
 
     def eval(self, df):

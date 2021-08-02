@@ -45,7 +45,7 @@ def func(lu):
     return funcs[lu]
 
 
-def syms(lu):
+def inputs(lu):
     if lu not in symbols:
         root = tree(lu)
         symbols[lu] = reval.find_inputs(root)

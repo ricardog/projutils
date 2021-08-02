@@ -70,7 +70,7 @@ def func(lu):
     return funcs[lu]
 
 
-def syms(lu):
+def inputs(lu):
     if lu not in symbols:
         root = tree(lu)
         symbols[lu] = reval.find_inputs(root)
@@ -80,7 +80,7 @@ def syms(lu):
 def all_files(hh):
     files = []
     for lu in hh:
-        files += syms(lu)
+        files += inputs(lu)
     return set(files)
 
 
@@ -154,7 +154,7 @@ def extract(fileobj, outdir, years):
 def project(lu, in_dir, year, mask):
     df = pd.DataFrame()
     shape = mask.shape
-    for name in syms(lu):
+    for name in inputs(lu):
         fname = os.path.join(in_dir, "%s.%s.tif" % (name, year))
         ds = gdal.Open(fname)
         if ds is None:

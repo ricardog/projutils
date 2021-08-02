@@ -37,7 +37,7 @@ class WPP(object):
         return self._sheet
 
     @property
-    def syms(self):
+    def inputs(self):
         return ["un_code", "hpd_ref"]
 
     def eval(self, df):
