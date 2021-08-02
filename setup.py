@@ -35,6 +35,7 @@ setup(
         "matplotlib",
         "netCDF4",
         "numpy",
+        "openpyxl",
         "pandas",
         "pylru",
         "r2py @ git+https://github.com/ricardog/r2py.git",
