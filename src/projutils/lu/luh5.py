@@ -15,7 +15,7 @@ LUp3 = {
     "mature_secondary": "secdm",
     "cropland": "c3ann + c4ann + c3nfx",
     "pasture": "pastr + range",
-    "urban": "urban",
+#    "urban": "urban",
     "plantation_pri": "c3per + c4per",
     "plantation_sec": 0,
 }
