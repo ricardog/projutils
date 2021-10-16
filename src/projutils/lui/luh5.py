@@ -77,7 +77,7 @@ class LUH5(object):
             return df[self._name] / 3
         if self._name[-10:] == "_secondary":
             return ma.where(df["secondary"] <= 0, 0,
-        #        df[self_name] * df[self._name] / (df["secondary"] + 1e-5))
+                            df[self_name] * df[self._name] / (df["secondary"] + 1e-5))
         if self.intensity == "minimal":
             res = df[self._name] - df[self.as_intense] - df[self.as_light]
             return res
