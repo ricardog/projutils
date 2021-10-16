@@ -46,7 +46,7 @@ def raster(ssp, year, res="luh2"):
         raise RuntimeError("year outside bounds (2015 <= %d <= 2100)" % year)
     return {
         "hpd": Raster("netcdf:%s/%s/sps.nc:%s" % (utils.outdir(), res, ssp),
-                      band=year - 2009,
+                      bands=year - 2009,
                       )
     }
 
@@ -60,11 +60,11 @@ def scale_grumps(ssp, year, res="luh2"):
     )
     rasters["hpd_ref"] = Raster(
         "netcdf:%s/%s/sps.nc:%s" % (utils.outdir(), res, ssp),
-        band=years(ssp).index(REFERENCE_YEAR) + 1,
+        bands=years(ssp).index(REFERENCE_YEAR) + 1,
     )
     rasters["hpd_proj"] = Raster(
         "netcdf:%s/%s/sps.nc:%s" % (utils.outdir(), res, ssp),
-        band=years(ssp).index(year) + 1,
+        bands=years(ssp).index(year) + 1,
     )
     rasters["hpd"] = Sps(year)
     return rasters
