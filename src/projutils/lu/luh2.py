@@ -25,6 +25,9 @@ def types():
     return sorted(LU.keys())
 
 
+def types2():
+    return LU
+
 def expr(lu):
     if lu not in LU:
         raise ValueError("unknown land use type: '%s'" % lu)
