@@ -23,10 +23,10 @@ import rasterio.warp as rwarp
 import subprocess
 
 from rasterset import Raster, RasterSet, SimpleExpr
-import projections.reproject as reproj
-from projections.utils import data_root
+import projutils.reproject as reproj
+from projutils.utils import data_root
 
-from projections.utils import (
+from projutils.utils import (
     luh2_dir,
     luh2_prefix,
     luh2_scenarios,
@@ -79,9 +79,11 @@ def luh2_types(ssp, year):
         "c4per",
         "c3nfx",
     ]:
-        res[lu] = Raster("%s:%s" % (path, lu), bidx)
+        res[lu] = Raster("%s:%s" % (path, lu), bands=bidx,
+                         decode_times=False)
     for secd in luh2_secd_types():
-        res[secd] = Raster("%s:%s" % (luh2_secd(ssp), secd), bidx)
+        res[secd] = Raster("%s:%s" % (luh2_secd(ssp), secd), bands=bidx,
+                           decode_times=False)
     return res
 
 
@@ -98,6 +100,8 @@ def luh2_rasterset(scenario, year):
     rset_add(rset, "secondaryf", "secdyf + secdif + secdmf")
     rset_add(rset, "secondaryn", "secdyn + secdin + secdmn")
     rset_add(rset, "secondary", "secdyf + secdif + secdmf + secdyn + secdin + secdmn")
+    rset_add(rset, "secondary", "secdf + secdn")
+    rset_add(rset, "primary", "primf + primn")
     return RasterSet(rset)
 
 
@@ -131,7 +135,8 @@ def process_lu(rcp_lu, comps, luh2, mask=None):
             xxx = data * fract[idx] * shares[idx]
             dst.write(xxx.filled(meta["nodata"]), indexes=range(1, count + 1))
             with rasterio.open(outfn("luh2", "lu-%s.tif" % lu), "w", **lu_meta) as dst:
-                dst.write(shares[idx].filled(meta["nodata"]), indexes=1)
+                dst.write(shares[idx].filled(meta["nodata"]).squeeze(),
+                          indexes=1)
 
         cmd = [
             os.path.join(os.getcwd(), "lu-recalibrate.R"),
