@@ -38,7 +38,8 @@ class LUH5(object):
                 self._pkg = importlib.import_module(mod_name)
                 self._pkg_func = getattr(self._pkg, intensity + "_st")
                 self._inputs += getattr(self._pkg, "inputs")()
-                self._inputs += [f"{name}_ref"]
+                if mod_name != "secondary":
+                    self._inputs += [f"{mod_name}_{intensity}_ref"]
             if intensity == "light":
                 self._inputs += [name + "_intense"]
             elif intensity == "minimal":
@@ -68,18 +69,21 @@ class LUH5(object):
     def inputs(self):
         return self._inputs  # FIXME: + [self.name + '_ref']
 
+    def __repr__(self):
+        return f"f({', '.join(self.inputs)})"
+
     def eval(self, df):
         if self._name in ["plantation_pri", "plantation_sec"]:
             return df[self._name] / 3
         if self._name[-10:] == "_secondary":
             return ma.where(df["secondary"] <= 0, 0,
-                df["secondary_" + self.intensity] * df[self._name] / (df["secondary"] + 1e-5))
+        #        df[self_name] * df[self._name] / (df["secondary"] + 1e-5))
         if self.intensity == "minimal":
             res = df[self._name] - df[self.as_intense] - df[self.as_light]
             return res
         res = self._pkg_func(df)
         res[np.where(np.isnan(res))] = 1.0
-        res = np.clip(df[f"{self._name}_ref"] + res, 0, 1)
+        res = np.clip(df[f"{self.name}_ref"] + res, 0, 1)
         if self.intensity == "light":
             intense = df[self.as_intense] / (df[self._name] + 1e-10)
             res = np.where(intense + res > 1, 1 - intense, res)
