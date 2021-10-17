@@ -41,6 +41,7 @@ def raster(year):
         "hpd": Raster(
             "netcdf:%s/luh2/hyde.nc:popd" % utils.outdir(),
             bands=years().index(year),
+            decode_times=False
         )
     }
 
@@ -53,10 +54,12 @@ def scale_grumps(year):
     year_band = years().index(year)
     rasters["grumps"] = Raster("%s/luh2/gluds00ag.tif" % utils.outdir())
     rasters["hpd_ref"] = Raster(
-        "netcdf:%s/luh2/hyde.nc:popd" % utils.outdir(), bands=ref_band + 1
+        "netcdf:%s/luh2/hyde.nc:popd" % utils.outdir(), bands=ref_band + 1,
+        decode_times=False
     )
     rasters["hpd_proj"] = Raster(
-        "netcdf:%s/luh2/hyde.nc:popd" % utils.outdir(), bands=year_band + 1
+        "netcdf:%s/luh2/hyde.nc:popd" % utils.outdir(), bands=year_band + 1,
+        decode_times=False
     )
     rasters["hpd"] = Hyde(year)
     return rasters
