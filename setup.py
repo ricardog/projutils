@@ -27,7 +27,7 @@ setup(
     install_requires=[
         "cartopy==0.19.0.post1",
         "Click",
-        "gdal",
+        "gdal==3.0.4",
         "fiona",
         "geopandas",
         "geopy",
