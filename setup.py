@@ -25,7 +25,7 @@ setup(
     packages=find_packages(where="src"),
     include_package_data=True,
     install_requires=[
-        "cartopy",
+        "cartopy==0.19.0.post1",
         "Click",
         "gdal",
         "fiona",
